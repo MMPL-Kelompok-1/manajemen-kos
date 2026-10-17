@@ -1,0 +1,58 @@
+[
+  {
+    "id": "kos-melati",
+    "name": "Kos Melati",
+    "area": "Dekat Kampus",
+    "address": "Alamat lengkap akan diisi setelah data asli tersedia",
+    "price": 1500000,
+    "gender": "Putri",
+    "roomSize": "3 x 4 m",
+    "bathroom": "Dalam",
+    "roomsLeft": 2,
+    "description": "Kos nyaman dengan kamar tidur luas, lemari besar, dan meja belajar. Lingkungan tenang dan aman, dekat dengan warung dan transportasi umum.",
+    "facilities": ["Kasur", "Lemari", "Meja belajar", "WiFi", "Kamar mandi dalam", "Parkir motor"],
+    "photos": [
+      "/images/kos-melati-1.jpg",
+      "/images/kos-melati-2.jpg",
+      "/images/kos-melati-3.jpg",
+      "/images/kos-melati-4.jpg"
+    ]
+  },
+  {
+    "id": "kos-anggrek",
+    "name": "Kos Anggrek",
+    "area": "Pusat Kota",
+    "address": "Alamat lengkap akan diisi setelah data asli tersedia",
+    "price": 1200000,
+    "gender": "Putra",
+    "roomSize": "3 x 3 m",
+    "bathroom": "Luar",
+    "roomsLeft": 4,
+    "description": "Kos sederhana dan bersih dengan harga terjangkau. Cocok untuk pekerja atau mahasiswa yang membutuhkan tempat tinggal praktis.",
+    "facilities": ["Kasur", "Lemari", "WiFi", "Dapur bersama", "Parkir motor"],
+    "photos": [
+      "/images/kos-anggrek-1.jpg",
+      "/images/kos-anggrek-2.jpg",
+      "/images/kos-anggrek-3.jpg"
+    ]
+  },
+  {
+    "id": "kos-mawar",
+    "name": "Kos Mawar",
+    "area": "Area Perumahan",
+    "address": "Alamat lengkap akan diisi setelah data asli tersedia",
+    "price": 2000000,
+    "gender": "Campur",
+    "roomSize": "4 x 4 m",
+    "bathroom": "Dalam",
+    "roomsLeft": 0,
+    "description": "Kamar lebih luas dengan AC, kamar mandi dalam, dan area bersama yang asri. Cocok untuk penghuni yang mengutamakan kenyamanan.",
+    "facilities": ["Kasur queen", "AC", "Lemari", "Meja belajar", "WiFi", "Kamar mandi dalam", "Dapur bersama"],
+    "photos": [
+      "/images/kos-mawar-1.jpg",
+      "/images/kos-mawar-2.jpg",
+      "/images/kos-mawar-3.jpg",
+      "/images/kos-mawar-4.jpg"
+    ]
+  }
+]
