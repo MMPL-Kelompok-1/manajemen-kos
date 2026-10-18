@@ -1,53 +1,167 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import LogoutButton from "@/components/auth/LogoutButton";
+import {
+    LayoutDashboard,
+    Building2,
+    Users,
+    CreditCard,
+    BarChart3
+} from "lucide-react";
 
 interface AdminSidebarProps {
-  children?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 export default function AdminSidebar({ children }: AdminSidebarProps) {
-  return (
-    <div className="drawer lg:drawer-open">
-      <input id="my-drawer-4" type="checkbox" className="drawer-toggle inline" />
-      <div className="drawer-content">
-        {/* Navbar */}
-        <nav className="navbar w-full bg-base-300">
-          <label htmlFor="my-drawer-4" aria-label="open sidebar" className="btn btn-square btn-ghost drawer-button">
-            {/* Sidebar toggle icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path><path d="M9 4v16"></path><path d="M14 10l2 2l-2 2"></path></svg>
-          </label>
-          <div className="px-4">Navbar Title</div>
-        </nav>
-        {/* Page content here */}
-        {children}
-      </div>
+    const [isOpen, setIsOpen] = useState(true);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const pathname = usePathname();
 
-      <div className="drawer-side is-drawer-close:overflow-visible">
-        <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
-        <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
-          {/* Sidebar content here */}
-          <ul className="menu w-full grow">
-            {/* List item */}
-            <li>
-              <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
-                {/* Home icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                <span className="is-drawer-close:hidden">Homepage</span>
-              </button>
-            </li>
+    return (
+        <div className="flex min-h-screen bg-zinc-50 text-zinc-900">
+            {/* Mobile Backdrop */}
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs lg:hidden"
+                    onClick={() => setIsMobileOpen(false)}
+                />
+            )}
 
-            {/* List item */}
-            <li>
-              <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Settings">
-                {/* Settings icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
-                <span className="is-drawer-close:hidden">Settings</span>
-              </button>
-            </li>
-          </ul>
+            {/* Sidebar kiri */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-zinc-200 bg-zinc-100 transition-all duration-200 lg:static ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                    } ${isOpen ? "w-64" : "lg:w-16"}`}
+            >
+                {/* Header Sidebar */}
+                <div className="flex h-14 items-center border-b border-zinc-200/70 px-4">
+                    {isOpen ? (
+                        <div className="flex items-center gap-2">
+                            <span className="flex size-7 items-center justify-center rounded-lg bg-zinc-950 text-xs font-bold text-white">
+                                K
+                            </span>
+                            <span className="font-bold text-zinc-900">KosanKu</span>
+                        </div>
+                    ) : (
+                        <span className="mx-auto flex size-7 items-center justify-center rounded-lg bg-zinc-950 text-xs font-bold text-white">
+                            K
+                        </span>
+                    )}
+                </div>
+
+                {/* Menu Navigasi */}
+                <nav className="flex-1 space-y-1.5 p-3">
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin"
+                            ? "bg-zinc-200 text-zinc-950 font-semibold"
+                            : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                            } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                        title="Dashboard"
+                    >
+                        <LayoutDashboard className="size-5 shrink-0" />
+                        <span className={!isOpen ? "lg:hidden" : ""}>Dashboard</span>
+                    </Link>
+
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/kos"
+                            ? "bg-zinc-200 text-zinc-950 font-semibold"
+                            : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                            } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                        title="Manajemen Kos & Kamar"
+                    >
+                        <Building2 className="size-5 shrink-0" />
+                        <span className={!isOpen ? "lg:hidden" : ""}>Manajemen Kos & Kamar</span>
+                    </Link>
+
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/penghuni"
+                            ? "bg-zinc-200 text-zinc-950 font-semibold"
+                            : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                            } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                        title="Manajemen Penghuni"
+                    >
+                        <Users className="size-5 shrink-0" />
+                        <span className={!isOpen ? "lg:hidden" : ""}>Manajemen Penghuni</span>
+                    </Link>
+
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/transaksi"
+                            ? "bg-zinc-200 text-zinc-950 font-semibold"
+                            : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                            } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                        title="Transaksi & Riwayat Pembayaran"
+                    >
+                        <CreditCard className="size-5 shrink-0" />
+                        <span className={!isOpen ? "lg:hidden" : ""}>Transaksi & Riwayat Pembayaran</span>
+                    </Link>
+
+                    <Link
+                        href="/admin"
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/laporan"
+                            ? "bg-zinc-200 text-zinc-950 font-semibold"
+                            : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                            } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                        title="Laporan Keuangan & Rekapitulasi"
+                    >
+                        <BarChart3 className="size-5 shrink-0" />
+                        <span className={!isOpen ? "lg:hidden" : ""}>Laporan Keuangan & Rekapitulasi</span>
+                    </Link>
+                </nav>
+            </aside>
+
+            {/* Konten Kanan: Top Navbar + Children */}
+            <div className="flex flex-1 flex-col min-w-0">
+                {/* Top Navbar */}
+                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-200 bg-zinc-200/90 px-4 backdrop-blur">
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (window.innerWidth < 1024) {
+                                    setIsMobileOpen((prev) => !prev);
+                                } else {
+                                    setIsOpen((prev) => !prev);
+                                }
+                            }}
+                            className="inline-flex size-9 items-center justify-center rounded-lg text-zinc-700 hover:bg-zinc-300 transition-colors"
+                            aria-label="Toggle sidebar"
+                        >
+                            {/* Sidebar toggle icon */}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                strokeWidth="2"
+                                fill="none"
+                                stroke="currentColor"
+                                className="size-5"
+                            >
+                                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+                                <path d="M9 4v16"></path>
+                                <path d="M14 10l2 2l-2 2"></path>
+                            </svg>
+                        </button>
+                        <span className="font-semibold text-zinc-900">Dashboard Admin</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <LogoutButton redirectTo="/admin/login" />
+                    </div>
+                </header>
+
+                {/* Konten Halaman */}
+                <div className="flex-1">
+                    {children}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

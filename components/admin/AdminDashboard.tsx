@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Search } from "lucide-react";
-import LogoutButton from "@/components/auth/LogoutButton";
 import StatusBadge from "@/components/StatusBadge";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { formatDate, formatRupiah } from "@/lib/format";
@@ -44,17 +43,7 @@ export default function AdminDashboard({ overview }: { overview: AdminOverview }
 
   return (
     <AdminSidebar>
-      <div className="min-h-[100svh] bg-zinc-50">
-        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-            <div>
-              <p className="text-xs text-zinc-500">KosanKu</p>
-              <p className="font-bold leading-tight">Dashboard Admin</p>
-            </div>
-            <LogoutButton redirectTo="/admin/login" />
-          </div>
-        </header>
-
+      <div className="min-h-full">
         <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 pb-12 sm:px-6 md:py-8">
           {/* Ringkasan */}
           <section className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">

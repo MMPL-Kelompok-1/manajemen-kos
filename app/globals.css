@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 @theme {
   --font-sans: Ubuntu, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
