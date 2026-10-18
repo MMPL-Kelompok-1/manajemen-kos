@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, Search, X } from "lucide-react";
+import { useAuthModal } from "@/components/auth/AuthModalContext";
 
 const navLinks = [
   { href: "/#top", label: "Beranda" },
@@ -12,8 +13,10 @@ const navLinks = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { openModal } = useAuthModal();
+
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link
           href="/"
@@ -38,18 +41,20 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="hidden rounded-full px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 sm:inline-flex"
+          <button
+            type="button"
+            onClick={() => openModal("masuk")}
+            className="hidden rounded-full px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 sm:inline-flex"
           >
             Masuk
-          </Link>
-          <Link
-            href="/login?tab=daftar"
-            className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          </button>
+          <button
+            type="button"
+            onClick={() => openModal("daftar")}
+            className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
           >
             Daftar
-          </Link>
+          </button>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -74,13 +79,28 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="mt-2 block rounded-xl border border-zinc-200 px-3 py-3 text-center text-base font-medium"
-          >
-            Masuk
-          </Link>
+          <div className="mt-3 flex flex-col gap-2 border-t border-zinc-100 pt-3">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openModal("masuk");
+              }}
+              className="w-full rounded-xl border border-zinc-200 py-3 text-center text-sm font-medium text-zinc-900 transition hover:bg-zinc-50"
+            >
+              Masuk
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openModal("daftar");
+              }}
+              className="w-full rounded-xl bg-zinc-950 py-3 text-center text-sm font-medium text-white transition hover:bg-zinc-800"
+            >
+              Daftar
+            </button>
+          </div>
         </nav>
       )}
     </header>

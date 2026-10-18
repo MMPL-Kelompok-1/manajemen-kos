@@ -1,17 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUp, Mail, MapPin, Phone, Search } from "lucide-react";
+import { useAuthModal } from "@/components/auth/AuthModalContext";
 
 // Ubah kontak di sini.
 const EMAIL = "KosanKu@gmail.com";
 const TELEPON = "+62 1234 5678 9012";
-
-const menu = [
-  { label: "Beranda", href: "/" },
-  { label: "Keunggulan", href: "/#keunggulan" },
-  { label: "Kos", href: "/#kos" },
-  { label: "Daftar", href: "/login?tab=daftar" },
-  { label: "Login pemilik kos", href: "/admin/login" },
-];
 
 const cardClass =
   "rounded-3xl border border-white/10 bg-white/[.04] p-6 sm:p-8";
@@ -20,6 +15,8 @@ const ikonClass =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 transition-colors";
 
 export default function Footer() {
+  const { openModal } = useAuthModal();
+
   return (
     <footer className="border-t border-white/10 bg-zinc-950 text-white">
       <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-6 md:pt-16">
@@ -41,17 +38,52 @@ export default function Footer() {
           <nav aria-label="Menu footer" className={cardClass}>
             <p className={labelClass}>Menu</p>
             <ul className="mt-5 flex flex-col gap-1">
-              {menu.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white"
-                  >
-                    <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/"
+                  className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white"
+                >
+                  <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
+                  Beranda
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#keunggulan"
+                  className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white"
+                >
+                  <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
+                  Keunggulan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#kos"
+                  className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white"
+                >
+                  <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
+                  Kos
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => openModal("daftar")}
+                  className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white text-left"
+                >
+                  <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
+                  Daftar
+                </button>
+              </li>
+              <li>
+                <Link
+                  href="/admin/login"
+                  className="group inline-flex items-center gap-2 py-1.5 text-zinc-300 transition-colors hover:text-white"
+                >
+                  <span className="h-px w-3 bg-zinc-600 transition-all group-hover:w-5 group-hover:bg-white" />
+                  Login pemilik kos
+                </Link>
+              </li>
             </ul>
           </nav>
 

@@ -85,13 +85,13 @@ export default function AdminLoginForm() {
             {loading ? "Memproses..." : "Masuk"}
           </button>
         </form>
-
         <p className="mt-6 text-center text-sm text-zinc-500">
           Penghuni?{" "}
-          <Link href="/login" className="font-semibold text-zinc-950 underline">
+          <Link href="/" className="font-semibold text-zinc-950 underline">
             Masuk di sini
           </Link>
         </p>
+
       </div>
     </main>
   );

@@ -1,22 +1,40 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 
 type Tab = "masuk" | "daftar";
 
+interface AuthFormsProps {
+  initialTab?: Tab;
+  kosId?: string | null;
+  isModal?: boolean;
+  onClose?: () => void;
+}
+
 // Form masuk & daftar untuk penghuni / calon penghuni.
-export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosId: string | null }) {
+export default function AuthForms({
+  initialTab = "masuk",
+  kosId = null,
+  isModal = false,
+  onClose,
+}: AuthFormsProps) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>(initialTab);
   const [form, setForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setTab(initialTab);
+    setError("");
+  }, [initialTab]);
+
   const isRegister = tab === "daftar";
   const inputClass =
-    "mt-1.5 w-full rounded-xl border border-zinc-200 px-4 py-3 text-base outline-none focus:border-zinc-950 sm:text-sm";
+    "mt-1.5 w-full rounded-2xl border border-zinc-200/80 bg-[#edf3fc] px-4 py-3 text-base text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white sm:text-sm";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,6 +54,10 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Gagal. Coba lagi.");
 
+      if (isModal && onClose) {
+        onClose();
+      }
+
       const target = kosId ? `/dashboard?kos=${encodeURIComponent(kosId)}` : "/dashboard";
       router.replace(target);
       router.refresh();
@@ -46,9 +68,20 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-5 py-12 sm:py-20">
-      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
-        <div className="grid grid-cols-2 rounded-full bg-zinc-100 p-1 text-sm font-semibold">
+    <div className={isModal ? "w-full" : "mx-auto w-full max-w-md px-5 py-12 sm:py-20"}>
+      <div className="relative rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-xl sm:p-8">
+        {isModal && onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup"
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-800 sm:right-6 sm:top-6"
+          >
+            <X size={20} />
+          </button>
+        )}
+
+        <div className={`grid grid-cols-2 rounded-full bg-zinc-100 p-1 text-sm font-semibold ${isModal ? "pr-8 sm:pr-0" : ""}`}>
           {(["masuk", "daftar"] as Tab[]).map((value) => (
             <button
               key={value}
@@ -57,9 +90,8 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
                 setTab(value);
                 setError("");
               }}
-              className={`rounded-full py-2.5 capitalize transition ${
-                tab === value ? "bg-white shadow-sm" : "text-zinc-500"
-              }`}
+              className={`rounded-full py-2.5 capitalize transition ${tab === value ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-500 hover:text-zinc-800"
+                }`}
             >
               {value === "masuk" ? "Masuk" : "Daftar"}
             </button>
@@ -75,18 +107,19 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {isRegister && (
             <>
-              <label className="block text-sm font-semibold">
+              <label className="block text-sm font-semibold text-zinc-900">
                 Nama lengkap
                 <input
                   required
                   minLength={3}
                   autoComplete="name"
+                  placeholder="Nama lengkap Anda"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className={inputClass}
                 />
               </label>
-              <label className="block text-sm font-semibold">
+              <label className="block text-sm font-semibold text-zinc-900">
                 Nomor HP
                 <input
                   required
@@ -102,7 +135,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
             </>
           )}
 
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-semibold text-zinc-900">
             Gmail
             <input
               required
@@ -118,14 +151,14 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
             />
           </label>
 
-          <label className="block text-sm font-semibold">
+          <label className="block text-sm font-semibold text-zinc-900">
             Kata sandi
             <input
               required
               type="password"
               minLength={isRegister ? 8 : undefined}
               autoComplete={isRegister ? "new-password" : "current-password"}
-              placeholder={isRegister ? "Minimal 8 karakter" : ""}
+              placeholder={isRegister ? "Minimal 8 karakter" : "••••••••"}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className={inputClass}
@@ -141,19 +174,25 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-zinc-950 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="w-full rounded-full bg-zinc-950 py-3.5 font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
           >
             {loading ? "Memproses..." : isRegister ? "Daftar akun" : "Masuk"}
           </button>
         </form>
+        <p className="mt-6 text-center text-sm text-zinc-500">
+          Pemilik kos?{" "}
+          <Link
+            href="/admin/login"
+            onClick={() => {
+              if (isModal && onClose) onClose();
+            }}
+            className="font-semibold text-zinc-950 underline"
+          >
+            Masuk sebagai admin
+          </Link>
+        </p>
       </div>
 
-      <p className="mt-6 text-center text-sm text-zinc-500">
-        Pemilik kos?{" "}
-        <Link href="/admin/login" className="font-semibold text-zinc-950 underline">
-          Masuk sebagai admin
-        </Link>
-      </p>
     </div>
   );
 }
