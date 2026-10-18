@@ -99,7 +99,7 @@ export default function AuthForms({
         </div>
 
         {kosId && (
-          <p className="mt-5 rounded-xl bg-zinc-50 p-3 text-sm text-zinc-600">
+          <p className="mt-5 rounded-xl bg-ctp-base p-3 text-sm text-ctp-subtext0">
             Setelah {isRegister ? "mendaftar" : "masuk"}, kos pilihan Anda akan diproses untuk pembayaran.
           </p>
         )}
@@ -166,7 +166,7 @@ export default function AuthForms({
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+            <p role="alert" className="rounded-xl bg-ctp-red/10 p-3 text-sm text-ctp-red">
               {error}
             </p>
           )}
@@ -174,7 +174,7 @@ export default function AuthForms({
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-zinc-950 py-3.5 font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
+            className="w-full rounded-full bg-ctp-accent py-3 font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text disabled:opacity-50"
           >
             {loading ? "Memproses..." : isRegister ? "Daftar akun" : "Masuk"}
           </button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Font: memakai Ubuntu jika terpasang di perangkat, lalu fallback sistem.
 // Untuk memuat Ubuntu otomatis, gunakan next/font/google (lihat README).
@@ -24,8 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-white text-zinc-900">
+      <body className="flex min-h-full flex-col bg-ctp-base text-ctp-text">
         {children}
+        <ThemeToggle />
       </body>
     </html>
   );

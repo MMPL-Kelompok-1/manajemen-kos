@@ -35,10 +35,10 @@ export default function AdminDashboard({ overview }: { overview: AdminOverview }
   }, [rows, query, filter]);
 
   const statCards = [
-    { label: "Penghuni lunas", value: stats.lunas, tone: "text-emerald-700" },
-    { label: "Menunggu konfirmasi", value: stats.menungguKonfirmasi, tone: "text-blue-700" },
-    { label: "Terlambat", value: stats.terlambat, tone: "text-red-700" },
-    { label: "Belum bayar", value: stats.belumBayar, tone: "text-amber-700" },
+    { label: "Penghuni lunas", value: stats.lunas, tone: "text-ctp-green" },
+    { label: "Menunggu konfirmasi", value: stats.menungguKonfirmasi, tone: "text-ctp-blue" },
+    { label: "Terlambat", value: stats.terlambat, tone: "text-ctp-red" },
+    { label: "Belum bayar", value: stats.belumBayar, tone: "text-ctp-yellow" },
   ];
 
   return (
@@ -274,12 +274,12 @@ function VerifyOrderPaymentButton({ paymentId }: { paymentId: string }) {
         type="button"
         onClick={verify}
         disabled={loading}
-        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-ctp-accent px-4 py-2.5 text-sm font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text disabled:opacity-50"
       >
         <Check size={16} />
         {loading ? "Memproses..." : "Setujui pembayaran"}
       </button>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-ctp-red">{error}</p>}
     </div>
   );
 }
@@ -321,7 +321,7 @@ function ConfirmButton({ row, fullWidth = false }: { row: TenantRow; fullWidth?:
         <Check size={16} />
         {loading ? "Memproses..." : "Konfirmasi lunas"}
       </button>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-ctp-red">{error}</p>}
     </div>
   );
 }
@@ -362,20 +362,20 @@ function RoomEditor({ registrationId, initial }: { registrationId: string; initi
           placeholder="Belum ada"
           onChange={(e) => setValue(e.target.value)}
           aria-label="Nomor kamar"
-          className="w-full min-w-0 rounded-lg border border-zinc-200 px-3 py-2 text-base outline-none focus:border-zinc-950 sm:text-sm lg:w-24"
+          className="w-full min-w-0 rounded-lg border border-ctp-surface0 px-3 py-2 text-base outline-none focus:border-ctp-accent sm:text-sm lg:w-24"
         />
         {dirty && (
           <button
             type="button"
             onClick={save}
             disabled={saving}
-            className="shrink-0 rounded-lg bg-zinc-100 px-3 py-2 text-sm font-medium hover:bg-zinc-200 disabled:opacity-50"
+            className="shrink-0 rounded-lg bg-ctp-mantle px-3 py-2 text-sm font-medium hover:bg-ctp-surface0 disabled:opacity-50"
           >
             {saving ? "…" : "Simpan"}
           </button>
         )}
       </div>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-ctp-red">{error}</p>}
     </div>
   );
 }

@@ -9,27 +9,27 @@ const EMAIL = "KosanKu@gmail.com";
 const TELEPON = "+62 1234 5678 9012";
 
 const cardClass =
-  "rounded-3xl border border-white/10 bg-white/[.04] p-6 sm:p-8";
-const labelClass = "text-xs font-bold uppercase tracking-[0.18em] text-zinc-500";
+  "rounded-3xl border border-ctp-on-lavender/20 bg-ctp-base/[.04] p-6 sm:p-8";
+const labelClass = "text-xs font-bold uppercase tracking-[0.18em] text-ctp-on-lavender";
 const ikonClass =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 transition-colors";
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ctp-on-lavender/30 transition-colors";
 
 export default function Footer() {
   const { openModal } = useAuthModal();
 
   return (
-    <footer className="border-t border-white/10 bg-zinc-950 text-white">
+    <footer className="border-t border-ctp-on-lavender/20 bg-ctp-accent text-ctp-on-lavender">
       <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-6 md:pt-16">
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
           {/* Card KosanKu */}
           <div className={`${cardClass} sm:col-span-2 md:col-span-1`}>
             <Link href="/" className="inline-flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-zinc-950">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ctp-base text-ctp-text">
                 <Search size={20} />
               </span>
               <span className="text-2xl font-bold tracking-tight">KosanKu</span>
             </Link>
-            <p className="mt-5 max-w-xs leading-relaxed text-zinc-400">
+            <p className="mt-5 max-w-xs leading-relaxed text-ctp-on-lavender">
               Kos nyaman dengan harga yang jelas dan pembayaran yang mudah.
             </p>
           </div>
@@ -94,9 +94,9 @@ export default function Footer() {
               <li>
                 <a
                   href={`mailto:${EMAIL}`}
-                  className="group flex items-center gap-3 text-zinc-300 transition-colors hover:text-white"
+                  className="group flex items-center gap-3 text-ctp-on-lavender transition-colors hover:text-ctp-on-lavender"
                 >
-                  <span className={`${ikonClass} group-hover:border-white group-hover:bg-white group-hover:text-zinc-950`}>
+                  <span className={`${ikonClass} group-hover:border-ctp-text group-hover:bg-ctp-base group-hover:text-ctp-text`}>
                     <Mail size={17} />
                   </span>
                   <span className="break-all">{EMAIL}</span>
@@ -105,15 +105,15 @@ export default function Footer() {
               <li>
                 <a
                   href={`tel:${TELEPON.replace(/\s/g, "")}`}
-                  className="group flex items-center gap-3 text-zinc-300 transition-colors hover:text-white"
+                  className="group flex items-center gap-3 text-ctp-on-lavender transition-colors hover:text-ctp-on-lavender"
                 >
-                  <span className={`${ikonClass} group-hover:border-white group-hover:bg-white group-hover:text-zinc-950`}>
+                  <span className={`${ikonClass} group-hover:border-ctp-text group-hover:bg-ctp-base group-hover:text-ctp-text`}>
                     <Phone size={17} />
                   </span>
                   {TELEPON}
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-zinc-300">
+              <li className="flex items-center gap-3 text-ctp-on-lavender">
                 <span className={ikonClass}>
                   <MapPin size={17} />
                 </span>
@@ -124,11 +124,11 @@ export default function Footer() {
         </div>
 
         {/* Baris bawah */}
-        <div className="mt-8 flex items-center justify-between gap-4 pb-[env(safe-area-inset-bottom)] text-sm text-zinc-500">
+        <div className="mt-8 flex items-center justify-between gap-4 pb-[env(safe-area-inset-bottom)] text-sm text-ctp-on-lavender">
           <p>© KosanKu. All rights reserved.</p>
           <a
             href="#"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-white"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-ctp-on-lavender"
           >
             Ke atas <ArrowUp size={14} />
           </a>

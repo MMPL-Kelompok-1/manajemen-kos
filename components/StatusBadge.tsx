@@ -1,11 +1,11 @@
 import type { TenantStatus } from "@/lib/data";
 
 const config: Record<TenantStatus, { label: string; className: string }> = {
-  belum_pilih_kos: { label: "Belum pilih kos", className: "bg-zinc-100 text-zinc-700" },
-  belum_bayar: { label: "Belum bayar", className: "bg-amber-100 text-amber-800" },
-  menunggu_konfirmasi: { label: "Menunggu konfirmasi", className: "bg-blue-100 text-blue-800" },
-  lunas: { label: "Lunas", className: "bg-emerald-100 text-emerald-800" },
-  terlambat: { label: "Terlambat", className: "bg-red-100 text-red-700" },
+  belum_pilih_kos: { label: "Belum pilih kos", className: "bg-ctp-mantle text-ctp-subtext1" },
+  belum_bayar: { label: "Belum bayar", className: "bg-ctp-yellow/15 text-ctp-yellow" },
+  menunggu_konfirmasi: { label: "Menunggu konfirmasi", className: "bg-ctp-blue/15 text-ctp-blue" },
+  lunas: { label: "Lunas", className: "bg-ctp-green/15 text-ctp-green" },
+  terlambat: { label: "Terlambat", className: "bg-ctp-red/15 text-ctp-red" },
 };
 
 export default function StatusBadge({ status }: { status: TenantStatus }) {

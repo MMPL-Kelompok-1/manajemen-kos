@@ -23,7 +23,7 @@ export default function KosGallery({ photos, name }: { photos: string[]; name: s
               onClick={() => setActive(index)}
               aria-label={`Lihat foto ${index + 1}`}
               className={`aspect-[4/3] overflow-hidden rounded-xl border-2 ${
-                index === active ? "border-zinc-950" : "border-transparent"
+                index === active ? "border-ctp-accent" : "border-transparent"
               }`}
             >
               <ListingImage src={photo} alt={`Foto ${index + 1}`} />
