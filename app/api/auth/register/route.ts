@@ -9,8 +9,8 @@ export async function POST(request: Request) {
   if (!body) return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });
   try {
     const account = await registerAccount(body);
-    const response = NextResponse.json({ role: "user", name: account.name }, { status: 201 });
-    return withSession(response, account.id, "user");
+    const response = NextResponse.json({ role: account.role, name: account.name }, { status: 201 });
+    return withSession(response, account.id, account.role);
   } catch (error) {
     return errorResponse(error);
   }

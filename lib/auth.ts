@@ -22,17 +22,17 @@ export async function getSession(): Promise<Session | null> {
   return parseSessionToken(store.get(SESSION_COOKIE)?.value, now);
 }
 
-// Untuk halaman: alihkan ke login bila bukan penghuni.
+// Untuk halaman: alihkan ke login bila bukan client.
 export async function requireUser(): Promise<Session> {
   const session = await getSession();
-  if (!session || session.role !== "user") redirect("/login");
+  if (!session || session.role !== "client") redirect("/login");
   return session;
 }
 
-// Untuk halaman: alihkan ke login admin bila bukan admin.
+// Untuk halaman: alihkan ke login pemilik bila bukan owner.
 export async function requireAdmin(): Promise<Session> {
   const session = await getSession();
-  if (!session || session.role !== "admin") redirect("/admin/login");
+  if (!session || session.role !== "owner") redirect("/admin/login");
   return session;
 }
 
@@ -49,15 +49,4 @@ export async function requireRole(role: Role): Promise<Session> {
 export function withSession(response: NextResponse, id: string, role: Role): NextResponse {
   response.cookies.set(SESSION_COOKIE, createSessionToken(id, role), sessionCookieOptions);
   return response;
-}
-
-// Kredensial admin dari environment. Di development ada nilai default; di production wajib diatur.
-export function checkAdminCredentials(email: string, password: string): boolean {
-  const isDev = process.env.NODE_ENV !== "production";
-  const adminEmail = process.env.ADMIN_EMAIL ?? (isDev ? "admin@KosanKu.local" : "");
-  const adminPassword = process.env.ADMIN_PASSWORD ?? (isDev ? "admin12345" : "");
-  if (!adminEmail || !adminPassword) return false;
-  return (
-    email.trim().toLowerCase() === adminEmail.trim().toLowerCase() && password === adminPassword
-  );
 }

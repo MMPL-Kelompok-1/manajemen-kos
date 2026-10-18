@@ -6,7 +6,7 @@ import { errorResponse, readJson } from "@/lib/http";
 // PATCH /api/admin/registrations/:id  body: { roomNumber }  (khusus admin)
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireRole("admin");
+    await requireRole("owner");
     const { id } = await params;
     const body = await readJson(request);
     if (!body) return NextResponse.json({ error: "Body JSON tidak valid" }, { status: 400 });

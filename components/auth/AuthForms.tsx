@@ -25,7 +25,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
 
     const body = isRegister
       ? { name: form.name, phone: form.phone, email: form.email, password: form.password }
-      : { role: "user", email: form.email, password: form.password };
+      : { role: "client", email: form.email, password: form.password };
 
     try {
       const res = await fetch(isRegister ? "/api/auth/register" : "/api/auth/login", {

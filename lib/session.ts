@@ -5,7 +5,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 export const SESSION_COOKIE = "KosanKu_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
 
-export type Role = "admin" | "user";
+export type Role = "client" | "owner";
 export type Session = { id: string; role: Role; exp: number };
 
 function getSecret(): string {
@@ -39,7 +39,7 @@ export function parseSessionToken(token: string | undefined, now: number): Sessi
   try {
     const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8")) as Session;
     if (session.exp < now) return null;
-    if (session.role !== "admin" && session.role !== "user") return null;
+    if (session.role !== "owner" && session.role !== "client") return null;
     return session;
   } catch {
     return null;

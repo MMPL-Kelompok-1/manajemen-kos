@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleEnum {
+  client
+  owner
+}
+
+enum RoomStatusEnum {
+  available
+  occupied
+  maintenance
+}
+
+enum OrderStatusEnum {
+  pending
+  confirmed
+  cancelled
+}
+
+enum PaymentStatusEnum {
+  unpaid
+  paid
+  refunded
+}
+
+enum ReminderTypeEnum {
+  payment
+  checkin
+  review
+}
+
+enum ReminderStatusEnum {
+  pending
+  sent
+  failed
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  phone     String
+  role      RoleEnum
+  kos       Kos[]      @relation("KosOwner")
+  orders    Order[]    @relation("OrderClient")
+  reviews   Review[]   @relation("ReviewClient")
+  reminders Reminder[] @relation("ReminderClient")
+}
+
+model Kos {
+  id             String   @id @default(cuid())
+  name           String
+  address        String
+  phone          String
+  background_img String
+  owner_id       String
+  owner          User     @relation("KosOwner", fields: [owner_id], references: [id], onDelete: Restrict)
+  rooms          Room[]
+  reviews        Review[]
+
+  @@index([owner_id])
+}
+
+model Room {
+  id          String         @id @default(cuid())
+  room_number String
+  price       Decimal        @db.Decimal(10, 2)
+  facilities  String[]
+  status      RoomStatusEnum
+  kos_id      String
+  kos         Kos            @relation(fields: [kos_id], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  @@index([kos_id])
+}
+
+model Order {
+  id          String          @id @default(cuid())
+  room_id     String
+  start_date  DateTime
+  end_date    DateTime
+  status      OrderStatusEnum
+  created_at  DateTime        @default(now())
+  client_id   String
+  room        Room            @relation(fields: [room_id], references: [id], onDelete: Restrict)
+  client      User            @relation("OrderClient", fields: [client_id], references: [id], onDelete: Restrict)
+  payments    Payment[]
+  reminders   Reminder[]
+  webhookLogs WebhookLog[]
+
+  @@index([room_id])
+  @@index([client_id, created_at])
+}
+
+model Payment {
+  id                     String            @id @default(cuid())
+  gateway_transaction_id String?
+  method                 String?
+  status                 PaymentStatusEnum @default(unpaid)
+  url                    String?
+  snap_token             String?
+  order_id               String
+  amount                 Decimal           @db.Decimal(10, 2)
+  raw_response           Json?
+  paid_at                DateTime?
+  expired_at             DateTime
+  order                  Order             @relation(fields: [order_id], references: [id], onDelete: Restrict)
+
+  @@index([order_id])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  kos_id     String
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+  client_id  String
+  kos        Kos      @relation(fields: [kos_id], references: [id], onDelete: Cascade)
+  client     User     @relation("ReviewClient", fields: [client_id], references: [id], onDelete: Restrict)
+
+  @@index([kos_id, created_at])
+  @@index([client_id])
+}
+
+model Reminder {
+  id            String             @id @default(cuid())
+  order_id      String
+  client_id     String
+  email         String
+  reminder_type ReminderTypeEnum
+  message       String             @db.Text
+  status        ReminderStatusEnum @default(pending)
+  scheduled_at  DateTime
+  sent_at       DateTime?
+  order         Order              @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  client        User               @relation("ReminderClient", fields: [client_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([client_id])
+  @@index([status, scheduled_at])
+}
+
+model WebhookLog {
+  id         String   @id @default(cuid())
+  order_id   String?
+  payload    Json
+  event_type String
+  created_at DateTime @default(now())
+  order      Order?   @relation(fields: [order_id], references: [id], onDelete: SetNull)
+
+  @@index([order_id])
+  @@index([event_type, created_at])
+}

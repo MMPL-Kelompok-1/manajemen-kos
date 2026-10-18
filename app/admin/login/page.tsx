@@ -13,6 +13,6 @@ export default function AdminLoginPage() {
 
 async function AdminLoginContent() {
   const session = await getSession();
-  if (session?.role === "admin") redirect("/admin");
+  if (session?.role === "owner") redirect("/admin");
   return <AdminLoginForm />;
 }

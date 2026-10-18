@@ -18,8 +18,8 @@ async function LoginContent({ searchParams }: Props) {
   const session = await getSession();
 
   // Sudah masuk: langsung ke dashboard yang sesuai.
-  if (session?.role === "admin") redirect("/admin");
-  if (session?.role === "user") {
+  if (session?.role === "owner") redirect("/admin");
+  if (session?.role === "client") {
     redirect(kos ? `/dashboard?kos=${encodeURIComponent(kos)}` : "/dashboard");
   }
 

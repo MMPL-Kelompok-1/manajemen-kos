@@ -1,38 +1,25 @@
 // Lapisan data / backend.
-// Data disimpan sebagai file JSON di folder /data.
-// Untuk production, ganti readCollection/writeCollection dengan database.
-import { promises as fs } from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
-import { connection } from "next/server";
+import { OrderStatusEnum, PaymentStatusEnum, RoomStatusEnum, type Kos as PrismaKos, type Order as PrismaOrder, type Payment as PrismaPayment, type Room as PrismaRoom, type User as PrismaUser } from "@prisma/client";
+import type { Role } from "@/lib/session";
 import { BANK_INFO, type BankInfo, type PaymentStatus } from "@/lib/payment";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { addOneMonth } from "@/lib/format";
+import { prisma } from "@/lib/prisma";
 
 export type Kos = {
   id: string;
   name: string;
   area: string;
   address: string;
-  price: number; // harga per bulan (Rupiah)
-  gender: "Putra" | "Putri" | "Campur";
+  price: number;
+  gender: string;
   roomSize: string;
-  bathroom: "Dalam" | "Luar";
+  bathroom: string;
   roomsLeft: number;
   description: string;
   facilities: string[];
   photos: string[];
-};
-
-// Akun penghuni / calon penghuni. Koleksi "registrations" dipakai untuk kompatibilitas data lama.
-export type Registration = {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  passwordHash?: string;
-  roomNumber?: string | null; // nomor kamar, diisi admin
-  createdAt: string;
+  status: RoomStatusEnum;
 };
 
 export type Payment = {
@@ -43,7 +30,7 @@ export type Payment = {
   status: PaymentStatus;
   createdAt: string;
   updatedAt: string;
-  paidAt: string | null; // tanggal pembayaran dikonfirmasi lunas
+  paidAt: string | null;
 };
 
 export type AccountInfo = {
@@ -51,10 +38,10 @@ export type AccountInfo = {
   name: string;
   email: string;
   phone: string;
+  role: Role;
   roomNumber: string | null;
 };
 
-// Status yang ditampilkan ke admin dan penghuni.
 export type TenantStatus =
   | "belum_pilih_kos"
   | "belum_bayar"
@@ -71,7 +58,6 @@ export class ApiError extends Error {
   }
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
 const EMAIL_RE = /^[a-z0-9._%+-]+@gmail\.com$/;
 const PHONE_RE = /^(08\d{8,11}|628\d{8,11})$/;
 const MIN_PASSWORD = 8;
@@ -80,46 +66,73 @@ function cleanString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-async function readCollection<T>(name: string): Promise<T[]> {
-  // Menandai render sebagai request-time (diperlukan oleh cacheComponents saat membaca file).
-  await connection();
-  try {
-    const raw = await fs.readFile(path.join(DATA_DIR, `${name}.json`), "utf-8");
-    return JSON.parse(raw) as T[];
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw error;
-  }
-}
-
-async function writeCollection<T>(name: string, items: T[]): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  const file = path.join(DATA_DIR, `${name}.json`);
-  const tmp = `${file}.tmp`;
-  await fs.writeFile(tmp, JSON.stringify(items, null, 2), "utf-8");
-  await fs.rename(tmp, file);
-}
-
-function toAccount(reg: Registration): AccountInfo {
+function toAccount(
+  user: Pick<PrismaUser, "id" | "name" | "email" | "phone" | "role">,
+  roomNumber: string | null = null,
+): AccountInfo {
   return {
-    id: reg.id,
-    name: reg.name,
-    email: reg.email,
-    phone: reg.phone,
-    roomNumber: reg.roomNumber ?? null,
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    roomNumber,
+  };
+}
+
+function toPayment(payment: PrismaPayment, order: Pick<PrismaOrder, "id" | "client_id" | "room_id" | "created_at" | "status">): Payment {
+  return {
+    id: payment.id,
+    registrationId: order.client_id,
+    kosId: order.room_id,
+    amount: payment.amount.toNumber(),
+    status: payment.status === PaymentStatusEnum.paid
+      ? order.status === OrderStatusEnum.confirmed
+        ? "lunas"
+        : "menunggu_konfirmasi"
+      : "menunggu_pembayaran",
+    createdAt: order.created_at.toISOString(),
+    updatedAt: (payment.paid_at ?? payment.expired_at).toISOString(),
+    paidAt: payment.paid_at?.toISOString() ?? null,
+  };
+}
+
+function toKos(kos: PrismaKos & { rooms: PrismaRoom[] }): Kos {
+  const availableRooms = kos.rooms.filter((room) => room.status === RoomStatusEnum.available);
+  const sortedRooms = [...kos.rooms].sort((left, right) => left.price.toNumber() - right.price.toNumber());
+  const price = sortedRooms[0]?.price.toNumber() ?? 0;
+
+  return {
+    id: kos.id,
+    name: kos.name,
+    area: kos.address,
+    address: kos.address,
+    price,
+    gender: "Tidak ditentukan",
+    roomSize: "Tidak ditentukan",
+    bathroom: "Tidak ditentukan",
+    roomsLeft: availableRooms.length,
+    description: "Informasi kos belum tersedia.",
+    facilities: [...new Set(kos.rooms.flatMap((room) => room.facilities))],
+    photos: kos.background_img ? [kos.background_img] : [],
+    status: availableRooms.length > 0 ? RoomStatusEnum.available : RoomStatusEnum.occupied,
   };
 }
 
 // ---------- Kos ----------
 
 export async function getKosList(): Promise<Kos[]> {
-  return readCollection<Kos>("kos");
+  const kosList = await prisma.kos.findMany({ include: { rooms: true } });
+  return kosList.map(toKos);
 }
 
 export async function getKos(id: string): Promise<Kos | null> {
-  const list = await readCollection<Kos>("kos");
-  return list.find((k) => k.id === id) ?? null;
+  const kos = await prisma.kos.findUnique({ where: { id }, include: { rooms: true } });
+  return kos ? toKos(kos) : null;
 }
+
+export const getRooms = getKosList;
+export const getRoomById = getKos;
 
 // ---------- Akun ----------
 
@@ -145,46 +158,46 @@ export async function registerAccount(input: Record<string, unknown>): Promise<A
     throw new ApiError(`Kata sandi minimal ${MIN_PASSWORD} karakter`, 400);
   }
 
-  const registrations = await readCollection<Registration>("registrations");
-  if (registrations.some((r) => r.email === email)) {
+  if (await prisma.user.findUnique({ where: { email }, select: { id: true } })) {
     throw new ApiError("Gmail ini sudah terdaftar. Silakan masuk.", 409);
   }
 
-  const registration: Registration = {
-    id: randomUUID(),
-    name,
-    phone,
-    email,
-    passwordHash: hashPassword(password),
-    roomNumber: null,
-    createdAt: new Date().toISOString(),
-  };
-  registrations.push(registration);
-  await writeCollection("registrations", registrations);
-  return toAccount(registration);
+  const user = await prisma.user.create({
+    data: {
+      name,
+      phone,
+      email,
+      password: await hashPassword(password),
+      role: "client",
+    },
+  });
+  return toAccount(user);
 }
 
 export async function authenticateUser(input: Record<string, unknown>): Promise<AccountInfo> {
+  return authenticateAccount(input, "client");
+}
+
+export async function authenticateAccount(
+  input: Record<string, unknown>,
+  expectedRole: Role,
+): Promise<AccountInfo> {
   const email = cleanString(input.email).toLowerCase();
   const password = typeof input.password === "string" ? input.password : "";
-
-  const registrations = await readCollection<Registration>("registrations");
-  const user = registrations.find((r) => r.email === email);
-  if (!user || !verifyPassword(password, user.passwordHash)) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || user.role !== expectedRole || !(await verifyPassword(password, user.password))) {
     throw new ApiError("Gmail atau kata sandi salah", 401);
   }
   return toAccount(user);
 }
 
 export async function getAccount(id: string): Promise<AccountInfo | null> {
-  const registrations = await readCollection<Registration>("registrations");
-  const reg = registrations.find((r) => r.id === id);
-  return reg ? toAccount(reg) : null;
+  const user = await prisma.user.findUnique({ where: { id } });
+  return user ? toAccount(user) : null;
 }
 
 // ---------- Pembayaran ----------
 
-// Status turunan dari riwayat pembayaran seorang penghuni.
 function deriveStatus(latest: Payment | null, lastLunas: Payment | null): TenantStatus {
   if (!latest) return "belum_pilih_kos";
   if (latest.status === "menunggu_pembayaran") return "belum_bayar";
@@ -195,102 +208,135 @@ function deriveStatus(latest: Payment | null, lastLunas: Payment | null): Tenant
   return "lunas";
 }
 
-// Membuat tagihan. Satu penghuni hanya boleh punya satu tagihan yang belum lunas,
-// dan perpanjangan hanya untuk kos yang sama dengan yang sudah ditempati.
 export async function createPayment(registrationId: string, kosId: string) {
-  const registrations = await readCollection<Registration>("registrations");
-  if (!registrations.some((r) => r.id === registrationId)) {
-    throw new ApiError("Akun tidak ditemukan. Silakan masuk ulang.", 404);
-  }
+  const user = await prisma.user.findUnique({ where: { id: registrationId } });
+  if (!user) throw new ApiError("Akun tidak ditemukan. Silakan masuk ulang.", 404);
 
-  const payments = await readCollection<Payment>("payments");
-  const mine = payments.filter((p) => p.registrationId === registrationId);
-  if (mine.some((p) => p.status !== "lunas")) {
+  const orders = await prisma.order.findMany({
+    where: { client_id: registrationId },
+    include: { payments: true, room: { include: { kos: { include: { rooms: true } } } } },
+    orderBy: { created_at: "asc" },
+  });
+  if (orders.some((order) => order.status !== OrderStatusEnum.cancelled && order.payments.some(
+    (payment) => payment.status === PaymentStatusEnum.unpaid || order.status === OrderStatusEnum.pending,
+  ))) {
     throw new ApiError("Anda masih memiliki pembayaran yang belum selesai.", 409);
   }
 
   const kos = await getKos(kosId);
   if (!kos) throw new ApiError("Kos tidak ditemukan", 404);
 
-  const occupiedKosId = mine.find((p) => p.status === "lunas")?.kosId ?? null;
+  const existingConfirmedOrder = [...orders].reverse().find(
+    (order) => order.status === OrderStatusEnum.confirmed,
+  );
+  const occupiedKosId = existingConfirmedOrder?.room.kos_id ?? null;
   if (occupiedKosId && occupiedKosId !== kos.id) {
     throw new ApiError("Anda sudah menjadi penghuni di kos lain.", 409);
   }
-  if (!occupiedKosId && kos.roomsLeft <= 0) {
-    throw new ApiError("Maaf, kamar di kos ini sudah penuh", 409);
-  }
+  const room = occupiedKosId
+    ? existingConfirmedOrder?.room
+    : await prisma.room.findFirst({
+        where: { kos_id: kos.id, status: RoomStatusEnum.available },
+        orderBy: { price: "asc" },
+        include: { kos: true },
+      });
+  if (!room) throw new ApiError("Maaf, kamar di kos ini sudah penuh", 409);
 
-  const now = new Date().toISOString();
-  const payment: Payment = {
-    id: `PAY-${randomUUID().slice(0, 8).toUpperCase()}`,
-    registrationId,
-    kosId: kos.id,
-    amount: kos.price,
-    status: "menunggu_pembayaran",
-    createdAt: now,
-    updatedAt: now,
-    paidAt: null,
-  };
-
-  payments.push(payment);
-  await writeCollection("payments", payments);
-  return { payment, kosName: kos.name };
+  const startDate = new Date();
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 1);
+  const order = await prisma.order.create({
+    data: {
+      client_id: registrationId,
+      room_id: room.id,
+      start_date: startDate,
+      end_date: endDate,
+      status: OrderStatusEnum.pending,
+      payments: {
+        create: {
+          amount: room.price,
+          expired_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      },
+    },
+    include: { payments: true },
+  });
+  return { payment: toPayment(order.payments[0], order), kosName: room.kos.name };
 }
 
-// Penghuni menekan "Saya sudah membayar". Hanya untuk tagihan miliknya sendiri.
 export async function markPaymentPaid(paymentId: string, registrationId: string): Promise<Payment> {
-  const payments = await readCollection<Payment>("payments");
-  const payment = payments.find((p) => p.id === paymentId && p.registrationId === registrationId);
-  if (!payment) throw new ApiError("Pembayaran tidak ditemukan", 404);
-
-  if (payment.status === "menunggu_pembayaran") {
-    payment.status = "menunggu_konfirmasi";
-    payment.updatedAt = new Date().toISOString();
-    await writeCollection("payments", payments);
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    include: { order: true },
+  });
+  if (!payment || payment.order.client_id !== registrationId) {
+    throw new ApiError("Pembayaran tidak ditemukan", 404);
   }
-  return payment;
+
+  if (payment.status === PaymentStatusEnum.unpaid) {
+    const updated = await prisma.payment.update({
+      where: { id: paymentId },
+      data: { status: PaymentStatusEnum.paid, paid_at: new Date() },
+    });
+    return toPayment(updated, payment.order);
+  }
+  return toPayment(payment, payment.order);
 }
 
-// Admin mengonfirmasi pembayaran lunas. Kamar berkurang hanya pada penghuni baru.
 export async function confirmPayment(paymentId: string): Promise<Payment> {
-  const payments = await readCollection<Payment>("payments");
-  const payment = payments.find((p) => p.id === paymentId);
-  if (!payment) throw new ApiError("Pembayaran tidak ditemukan", 404);
-  if (payment.status === "lunas") return payment;
-
-  const isNewResident = !payments.some(
-    (p) => p.registrationId === payment.registrationId && p.status === "lunas"
-  );
-
-  const now = new Date().toISOString();
-  payment.status = "lunas";
-  payment.paidAt = now;
-  payment.updatedAt = now;
-  await writeCollection("payments", payments);
-
-  if (isNewResident) {
-    const kosList = await readCollection<Kos>("kos");
-    const kos = kosList.find((k) => k.id === payment.kosId);
-    if (kos && kos.roomsLeft > 0) {
-      kos.roomsLeft -= 1;
-      await writeCollection("kos", kosList);
+  return prisma.$transaction(async (tx) => {
+    const payment = await tx.payment.findUnique({
+      where: { id: paymentId },
+      include: {
+        order: {
+          include: { room: { include: { kos: { include: { rooms: true } } } } },
+        },
+      },
+    });
+    if (!payment) throw new ApiError("Pembayaran tidak ditemukan", 404);
+    if (payment.status === PaymentStatusEnum.refunded) {
+      throw new ApiError("Pembayaran yang dikembalikan tidak dapat dikonfirmasi", 409);
     }
-  }
-  return payment;
+    if (payment.status === PaymentStatusEnum.paid && payment.order.status === OrderStatusEnum.confirmed) {
+      return toPayment(payment, payment.order);
+    }
+
+    const now = new Date();
+    const updatedPayment = await tx.payment.update({
+      where: { id: paymentId },
+      data: { status: PaymentStatusEnum.paid, paid_at: payment.paid_at ?? now },
+    });
+    const order = await tx.order.update({
+      where: { id: payment.order_id },
+      data: { status: OrderStatusEnum.confirmed },
+      include: { room: { include: { kos: { include: { rooms: true } } } } },
+    });
+    if (order.room.status === RoomStatusEnum.available) {
+      await tx.room.update({
+        where: { id: order.room_id },
+        data: { status: RoomStatusEnum.occupied },
+      });
+    }
+    return toPayment(updatedPayment, order);
+  });
 }
 
-// Admin mengatur nomor kamar penghuni.
 export async function setRoomNumber(registrationId: string, value: unknown): Promise<AccountInfo> {
   const roomNumber = cleanString(value);
   if (roomNumber.length > 20) throw new ApiError("Nomor kamar maksimal 20 karakter", 400);
 
-  const registrations = await readCollection<Registration>("registrations");
-  const reg = registrations.find((r) => r.id === registrationId);
-  if (!reg) throw new ApiError("Penghuni tidak ditemukan", 404);
-
-  reg.roomNumber = roomNumber || null;
-  await writeCollection("registrations", registrations);
-  return toAccount(reg);
+  const user = await prisma.user.findUnique({
+    where: { id: registrationId },
+    include: { orders: { orderBy: { created_at: "desc" }, take: 1, include: { room: true } } },
+  });
+  if (!user) throw new ApiError("Penghuni tidak ditemukan", 404);
+  const latestOrder = user.orders[0];
+  if (!latestOrder) throw new ApiError("Penghuni belum memilih kamar", 409);
+  await prisma.room.update({
+    where: { id: latestOrder.room_id },
+    data: { room_number: roomNumber || latestOrder.room.room_number },
+  });
+  return toAccount(user, roomNumber || latestOrder.room.room_number);
 }
 
 // ---------- Data dashboard ----------
@@ -306,17 +352,24 @@ export type UserDashboardData = {
 };
 
 export async function getUserDashboard(registrationId: string): Promise<UserDashboardData | null> {
-  const account = await getAccount(registrationId);
-  if (!account) return null;
+  const user = await prisma.user.findUnique({
+    where: { id: registrationId },
+    include: {
+      orders: {
+        orderBy: { created_at: "asc" },
+        include: { payments: true, room: { include: { kos: { include: { rooms: true } } } } },
+      },
+    },
+  });
+  if (!user) return null;
 
-  const payments = await readCollection<Payment>("payments");
-  const mine = payments
-    .filter((p) => p.registrationId === registrationId)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const latestOrder = user.orders[user.orders.length - 1] ?? null;
+  const mine = user.orders.flatMap((order) => order.payments.map((payment) => toPayment(payment, order)));
   const latest = mine[mine.length - 1] ?? null;
-  const lastLunas = [...mine].reverse().find((p) => p.status === "lunas") ?? null;
+  const lastLunas = [...mine].reverse().find((payment) => payment.status === "lunas") ?? null;
+  const kos = latestOrder ? toKos(latestOrder.room.kos) : null;
+  const account = toAccount(user, latestOrder?.room.room_number ?? null);
 
-  const kos = latest ? await getKos(latest.kosId) : null;
   return {
     account,
     kos,
@@ -356,40 +409,82 @@ export type AdminOverview = {
 };
 
 export async function getAdminOverview(): Promise<AdminOverview> {
-  const [registrations, payments, kosList] = await Promise.all([
-    readCollection<Registration>("registrations"),
-    readCollection<Payment>("payments"),
-    readCollection<Kos>("kos"),
+  const [users, rooms] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: "client" },
+      include: {
+        orders: {
+          include: { room: { include: { kos: true } }, payments: true },
+          orderBy: { created_at: "asc" },
+        },
+      },
+    }),
+    prisma.room.findMany({ include: { kos: true } }),
   ]);
-  const kosMap = new Map(kosList.map((k) => [k.id, k]));
-
-  const rows: TenantRow[] = registrations.map((reg) => {
-    const mine = payments
-      .filter((p) => p.registrationId === reg.id)
-      .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    const latest = mine[mine.length - 1] ?? null;
-    const lastLunas = [...mine].reverse().find((p) => p.status === "lunas") ?? null;
-    const kos = latest ? kosMap.get(latest.kosId) ?? null : null;
+  const rows: TenantRow[] = users.map((user) => {
+    const orders = user.orders;
+    const latestOrder = orders[orders.length - 1] ?? null;
+    const latestPayment = latestOrder?.payments
+      .slice()
+      .sort((left, right) => right.expired_at.getTime() - left.expired_at.getTime())[0] ?? null;
+    const paidPayments = orders
+      .filter((order) => order.status === OrderStatusEnum.confirmed)
+      .flatMap((order) => order.payments)
+      .filter((payment) => payment.status === "paid" && payment.paid_at)
+      .sort((left, right) => right.paid_at!.getTime() - left.paid_at!.getTime());
+    const lastPaidAt = paidPayments[0]?.paid_at?.toISOString() ?? null;
+    const paymentStatus: PaymentStatus | null = latestPayment?.status === PaymentStatusEnum.paid
+      ? latestOrder?.status === OrderStatusEnum.confirmed
+        ? "lunas"
+        : "menunggu_konfirmasi"
+      : latestPayment?.status === PaymentStatusEnum.unpaid
+        ? "menunggu_pembayaran"
+        : null;
+    const status: TenantStatus = !latestOrder || latestOrder.status === "cancelled"
+      ? "belum_pilih_kos"
+      : paymentStatus === "lunas"
+        ? lastPaidAt && addOneMonth(lastPaidAt) < new Date().toISOString()
+          ? "terlambat"
+          : "lunas"
+        : paymentStatus === "menunggu_konfirmasi"
+          ? "menunggu_konfirmasi"
+          : "belum_bayar";
 
     return {
-      registrationId: reg.id,
-      name: reg.name,
-      phone: reg.phone,
-      email: reg.email,
-      kosName: kos?.name ?? null,
-      roomNumber: reg.roomNumber ?? null,
-      status: deriveStatus(latest, lastLunas),
-      amount: latest?.amount ?? null,
-      paymentId: latest?.id ?? null,
-      paymentStatus: latest?.status ?? null,
-      lastPaidAt: lastLunas?.paidAt ?? null,
-      dueAt: lastLunas?.paidAt ? addOneMonth(lastLunas.paidAt) : null,
+      registrationId: user.id,
+      name: user.name,
+      phone: user.phone,
+      email: user.email,
+      kosName: latestOrder?.room.kos.name ?? null,
+      roomNumber: latestOrder?.room.room_number ?? null,
+      status,
+      amount: latestPayment ? latestPayment.amount.toNumber() : null,
+      paymentId: paymentStatus ? latestPayment?.id ?? null : null,
+      paymentStatus,
+      lastPaidAt,
+      dueAt: lastPaidAt ? addOneMonth(lastPaidAt) : null,
     };
   });
 
   rows.sort((a, b) => a.name.localeCompare(b.name, "id"));
-
-  const count = (status: TenantStatus) => rows.filter((r) => r.status === status).length;
+  const count = (status: TenantStatus) => rows.filter((row) => row.status === status).length;
+  const kosSummary = new Map<string, AdminOverview["kosSummary"][number]>();
+  for (const room of rooms) {
+    const current = kosSummary.get(room.kos_id);
+    const roomsLeft = room.status === "available" ? 1 : 0;
+    const price = room.price.toNumber();
+    if (current) {
+      current.roomsLeft += roomsLeft;
+      current.price = Math.min(current.price, price);
+    } else {
+      kosSummary.set(room.kos_id, {
+        id: room.kos_id,
+        name: room.kos.name,
+        roomsLeft,
+        price,
+      });
+    }
+  }
   return {
     rows,
     stats: {
@@ -397,8 +492,8 @@ export async function getAdminOverview(): Promise<AdminOverview> {
       menungguKonfirmasi: count("menunggu_konfirmasi"),
       terlambat: count("terlambat"),
       belumBayar: count("belum_bayar"),
-      totalKamarTersisa: kosList.reduce((sum, k) => sum + k.roomsLeft, 0),
+      totalKamarTersisa: rooms.filter((room) => room.status === "available").length,
     },
-    kosSummary: kosList.map((k) => ({ id: k.id, name: k.name, roomsLeft: k.roomsLeft, price: k.price })),
+    kosSummary: [...kosSummary.values()],
   };
 }
