@@ -1,5 +1,6 @@
 // Lapisan data / backend.
 import { OrderStatusEnum, PaymentStatusEnum, RoomStatusEnum, type Kos as PrismaKos, type Order as PrismaOrder, type Payment as PrismaPayment, type Room as PrismaRoom, type User as PrismaUser } from "@prisma/client";
+import { connection } from "next/server";
 import type { Role } from "@/lib/session";
 import { BANK_INFO, type BankInfo, type PaymentStatus } from "@/lib/payment";
 import { hashPassword, verifyPassword } from "@/lib/password";
@@ -122,7 +123,36 @@ function toKos(kos: PrismaKos & { rooms: PrismaRoom[] }): Kos {
 // ---------- Kos ----------
 
 export async function getKosList(): Promise<Kos[]> {
-  const kosList = await prisma.kos.findMany({ include: { rooms: true } });
+  await connection();
+  const now = new Date();
+  const kosList = await prisma.kos.findMany({
+    where: {
+      rooms: {
+        some: {
+          status: RoomStatusEnum.available,
+          orders: {
+            none: {
+              status: OrderStatusEnum.pending,
+              payments: { some: { expired_at: { gt: now } } },
+            },
+          },
+        },
+      },
+    },
+    include: {
+      rooms: {
+        where: {
+          status: RoomStatusEnum.available,
+          orders: {
+            none: {
+              status: OrderStatusEnum.pending,
+              payments: { some: { expired_at: { gt: now } } },
+            },
+          },
+        },
+      },
+    },
+  });
   return kosList.map(toKos);
 }
 
@@ -209,59 +239,93 @@ function deriveStatus(latest: Payment | null, lastLunas: Payment | null): Tenant
 }
 
 export async function createPayment(registrationId: string, kosId: string) {
-  const user = await prisma.user.findUnique({ where: { id: registrationId } });
-  if (!user) throw new ApiError("Akun tidak ditemukan. Silakan masuk ulang.", 404);
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+    const user = await tx.user.findUnique({ where: { id: registrationId } });
+    if (!user || user.role !== "client") {
+      throw new ApiError("Akun penghuni tidak ditemukan. Silakan masuk ulang.", 404);
+    }
 
-  const orders = await prisma.order.findMany({
-    where: { client_id: registrationId },
-    include: { payments: true, room: { include: { kos: { include: { rooms: true } } } } },
-    orderBy: { created_at: "asc" },
-  });
-  if (orders.some((order) => order.status !== OrderStatusEnum.cancelled && order.payments.some(
-    (payment) => payment.status === PaymentStatusEnum.unpaid || order.status === OrderStatusEnum.pending,
-  ))) {
-    throw new ApiError("Anda masih memiliki pembayaran yang belum selesai.", 409);
-  }
+    await tx.order.updateMany({
+      where: {
+        client_id: registrationId,
+        status: OrderStatusEnum.pending,
+        AND: [
+          { payments: { some: {} } },
+          { payments: { every: { expired_at: { lte: now } } } },
+        ],
+      },
+      data: { status: OrderStatusEnum.cancelled },
+    });
 
-  const kos = await getKos(kosId);
-  if (!kos) throw new ApiError("Kos tidak ditemukan", 404);
+    const orders = await tx.order.findMany({
+      where: { client_id: registrationId },
+      include: { payments: true, room: true },
+      orderBy: { created_at: "asc" },
+    });
+    if (orders.some((order) =>
+      order.status === OrderStatusEnum.pending &&
+      order.payments.some((payment) => payment.expired_at > now)
+    )) {
+      throw new ApiError("Anda masih memiliki pembayaran yang belum selesai.", 409);
+    }
 
-  const existingConfirmedOrder = [...orders].reverse().find(
-    (order) => order.status === OrderStatusEnum.confirmed,
-  );
-  const occupiedKosId = existingConfirmedOrder?.room.kos_id ?? null;
-  if (occupiedKosId && occupiedKosId !== kos.id) {
-    throw new ApiError("Anda sudah menjadi penghuni di kos lain.", 409);
-  }
-  const room = occupiedKosId
-    ? existingConfirmedOrder?.room
-    : await prisma.room.findFirst({
-        where: { kos_id: kos.id, status: RoomStatusEnum.available },
-        orderBy: { price: "asc" },
-        include: { kos: true },
-      });
-  if (!room) throw new ApiError("Maaf, kamar di kos ini sudah penuh", 409);
+    const kos = await tx.kos.findUnique({ where: { id: kosId } });
+    if (!kos) throw new ApiError("Kos tidak ditemukan", 404);
 
-  const startDate = new Date();
-  const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + 1);
-  const order = await prisma.order.create({
-    data: {
-      client_id: registrationId,
-      room_id: room.id,
-      start_date: startDate,
-      end_date: endDate,
-      status: OrderStatusEnum.pending,
-      payments: {
-        create: {
-          amount: room.price,
-          expired_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    const existingConfirmedOrder = [...orders].reverse().find(
+      (order) => order.status === OrderStatusEnum.confirmed,
+    );
+    const occupiedKosId = existingConfirmedOrder
+      ? (await tx.room.findUnique({ where: { id: existingConfirmedOrder.room_id } }))?.kos_id ?? null
+      : null;
+    if (occupiedKosId && occupiedKosId !== kos.id) {
+      throw new ApiError("Anda sudah menjadi penghuni di kos lain.", 409);
+    }
+
+    const room = occupiedKosId && existingConfirmedOrder
+      ? await tx.room.findUnique({ where: { id: existingConfirmedOrder.room_id }, include: { kos: true } })
+      : await tx.room.findFirst({
+          where: {
+            kos_id: kos.id,
+            status: RoomStatusEnum.available,
+            orders: {
+              none: {
+                status: OrderStatusEnum.pending,
+                payments: { some: { expired_at: { gt: now } } },
+              },
+            },
+          },
+          orderBy: { price: "asc" },
+          include: { kos: true },
+        });
+    if (!room) throw new ApiError("Maaf, kamar di kos ini sudah penuh", 409);
+
+    const startDate = now;
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    const order = await tx.order.create({
+      data: {
+        client_id: registrationId,
+        room_id: room.id,
+        start_date: startDate,
+        end_date: endDate,
+        status: OrderStatusEnum.pending,
+        payments: {
+          create: {
+            status: PaymentStatusEnum.unpaid,
+            amount: room.price,
+            expired_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+          },
         },
       },
-    },
-    include: { payments: true },
-  });
-  return { payment: toPayment(order.payments[0], order), kosName: room.kos.name };
+      include: { payments: true },
+    });
+    const payment = order.payments[0];
+    if (!payment) throw new Error("Payment tidak berhasil dibuat.");
+
+    return { payment: toPayment(payment, order), kosName: room.kos.name };
+  }, { isolationLevel: "Serializable" });
 }
 
 export async function markPaymentPaid(paymentId: string, registrationId: string): Promise<Payment> {
@@ -274,6 +338,12 @@ export async function markPaymentPaid(paymentId: string, registrationId: string)
   }
 
   if (payment.status === PaymentStatusEnum.unpaid) {
+    if (payment.expired_at < new Date()) {
+      throw new ApiError("Waktu pembayaran sudah habis", 409);
+    }
+    if (payment.order.status !== OrderStatusEnum.pending) {
+      throw new ApiError("Pembayaran ini sudah tidak aktif", 409);
+    }
     const updated = await prisma.payment.update({
       where: { id: paymentId },
       data: { status: PaymentStatusEnum.paid, paid_at: new Date() },
