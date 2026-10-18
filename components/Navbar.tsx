@@ -7,7 +7,7 @@ const navLinks = [
   { href: "#kos", label: "Kos" },
 ];
 
-export default function SiteHeader() {
+export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
