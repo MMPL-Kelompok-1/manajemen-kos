@@ -10,7 +10,7 @@ export type BankInfo = {
 export const BANK_INFO: BankInfo = {
   bank: "BCA",
   accountNumber: "1234567890",
-  accountName: "PT StayEase Indonesia",
+  accountName: "PT KosanKu Indonesia",
 };
 
 export type PaymentStatus = "menunggu_pembayaran" | "menunggu_konfirmasi" | "lunas";

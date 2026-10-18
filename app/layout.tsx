@@ -6,9 +6,15 @@ import Footer from "@/components/Footer";
 // Font: memakai Ubuntu jika terpasang di perangkat, lalu fallback sistem.
 // Untuk memuat Ubuntu otomatis, gunakan next/font/google (lihat README).
 export const metadata: Metadata = {
-  title: "StayEase — Find Your Perfect Sanctuary",
+  title: "KosanKu — Find Your Perfect Sanctuary",
   description:
-    "Discover handpicked luxury rentals for your next unforgettable getaway.",
+    "Temukan kos nyaman dengan harga yang jelas dan pembayaran yang mudah.",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -17,11 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="id" className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-white text-zinc-900">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        {children}
       </body>
     </html>
   );

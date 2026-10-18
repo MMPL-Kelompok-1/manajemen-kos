@@ -41,5 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 # runtime data (jangan di-commit)
-/data/bookings.json
-/data/messages.json
+/data/registrations.json
+/data/payments.json

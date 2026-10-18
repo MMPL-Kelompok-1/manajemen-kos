@@ -2,11 +2,11 @@ import { Clock, Headset, ShieldCheck, Star, Zap } from "lucide-react";
 
 export default function WhyChooseUs() {
   return (
-    <section id="why" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-24">
+    <section id="why" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
           <p className="text-sm font-bold uppercase tracking-wider">Why choose us</p>
-          <h2 className="mt-3 text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+          <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
             Experience the difference
             <br />
             in every detail.
@@ -17,9 +17,9 @@ export default function WhyChooseUs() {
         </p>
       </div>
 
-      <div className="mt-14 grid gap-6 md:grid-cols-3">
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 md:mt-14 md:grid-cols-3 md:gap-6">
         {/* Kartu besar */}
-        <div className="relative overflow-hidden rounded-3xl bg-zinc-50 p-10 md:col-span-2">
+        <div className="relative overflow-hidden rounded-3xl bg-zinc-50 p-6 sm:p-8 sm:col-span-2 md:col-span-2 md:p-10">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
             <ShieldCheck size={22} />
           </div>
@@ -36,7 +36,7 @@ export default function WhyChooseUs() {
         </div>
 
         {/* Kartu gelap */}
-        <div className="rounded-3xl bg-zinc-950 p-10 text-white">
+        <div className="rounded-3xl bg-zinc-950 p-6 text-white sm:p-8 md:p-10">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
             <Star size={22} />
           </div>
@@ -49,7 +49,7 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-10">
+        <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 sm:p-8 md:p-10">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
             <Headset size={22} />
           </div>
@@ -59,7 +59,7 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200 p-10">
+        <div className="rounded-3xl border border-zinc-200 p-6 sm:p-8 md:p-10">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
             <Clock size={22} />
           </div>
@@ -67,7 +67,7 @@ export default function WhyChooseUs() {
           <p className="mt-3 text-zinc-500">Our dedicated team is available round the clock.</p>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200 p-10">
+        <div className="rounded-3xl border border-zinc-200 p-6 sm:p-8 md:p-10">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-600">
             <Zap size={22} />
           </div>
