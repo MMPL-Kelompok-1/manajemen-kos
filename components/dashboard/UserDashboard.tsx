@@ -130,6 +130,49 @@ export default function UserDashboard({ data, pendingKosId }: Props) {
           )}
         </section>
 
+        <section className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex items-center gap-2 text-sm font-semibold text-zinc-500">
+            <CalendarDays size={16} /> Histori pesanan
+          </div>
+          {data.orderHistory.length === 0 ? (
+            <p className="mt-4 text-sm text-zinc-500">Belum ada histori pesanan.</p>
+          ) : (
+            <ul className="mt-4 divide-y divide-zinc-100">
+              {data.orderHistory.map((order) => (
+                <li key={order.orderId} className="space-y-3 py-4 first:pt-0 last:pb-0">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{order.kosName}</p>
+                      <p className="text-sm text-zinc-500">Kamar {order.roomNumber}</p>
+                    </div>
+                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold capitalize text-zinc-700">
+                      {order.status === "pending" ? "Menunggu pembayaran" : order.status === "confirmed" ? "Terkonfirmasi" : "Dibatalkan"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-zinc-500">
+                    {formatDate(order.startDate)} - {formatDate(order.endDate)}
+                  </p>
+                  {order.payments.length > 0 ? (
+                    <ul className="space-y-2">
+                      {order.payments.map((orderPayment) => (
+                        <li key={orderPayment.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-zinc-50 px-3 py-2.5">
+                          <div>
+                            <p className="break-all font-mono text-xs font-semibold">{orderPayment.id}</p>
+                            <p className="text-sm text-zinc-600">{formatRupiah(orderPayment.amount)}</p>
+                          </div>
+                          <StatusBadge status={orderPayment.status === "menunggu_pembayaran" ? "belum_bayar" : orderPayment.status} />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-zinc-500">Belum ada tagihan untuk pesanan ini.</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
         {/* Pembayaran */}
         {payment && kos && (
           <section className="rounded-3xl bg-white p-5 shadow-sm sm:p-6">

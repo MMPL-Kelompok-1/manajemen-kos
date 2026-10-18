@@ -20,7 +20,7 @@ const filterOptions: { value: Filter; label: string }[] = [
 ];
 
 export default function AdminDashboard({ overview }: { overview: AdminOverview }) {
-  const { rows, stats, kosSummary } = overview;
+  const { rows, stats, kosSummary, orders } = overview;
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("semua");
 
@@ -78,6 +78,57 @@ export default function AdminDashboard({ overview }: { overview: AdminOverview }
               </p>
             </div>
           ))}
+        </section>
+
+        <section className="rounded-3xl bg-white shadow-sm">
+          <div className="border-b border-zinc-200 p-4 sm:p-6">
+            <h2 className="text-lg font-bold">Pesanan masuk</h2>
+            <p className="text-sm text-zinc-500">{orders.length} pesanan di Kos Anda</p>
+          </div>
+          {orders.length === 0 ? (
+            <p className="p-10 text-center text-sm text-zinc-500">Belum ada pesanan.</p>
+          ) : (
+            <ul className="divide-y divide-zinc-100">
+              {orders.map((order) => (
+                <li key={order.orderId} className="space-y-4 p-4 sm:p-6">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{order.kosName} · Kamar {order.roomNumber}</p>
+                      <p className="text-sm text-zinc-600">{order.clientName}</p>
+                      <p className="text-xs text-zinc-500">{order.clientEmail}</p>
+                    </div>
+                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold capitalize text-zinc-700">
+                      {order.status === "pending" ? "Menunggu pembayaran" : order.status === "confirmed" ? "Terkonfirmasi" : "Dibatalkan"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-zinc-500">
+                    {formatDate(order.startDate)} - {formatDate(order.endDate)}
+                  </p>
+                  {order.payments.length > 0 ? (
+                    <ul className="space-y-2">
+                      {order.payments.map((payment) => (
+                        <li key={payment.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-zinc-50 p-4">
+                          <div>
+                            <p className="break-all font-mono text-xs font-semibold">{payment.id}</p>
+                            <p className="mt-1 text-sm font-semibold">{formatRupiah(payment.amount)}</p>
+                            <p className="text-xs text-zinc-500">Batas pembayaran {formatDate(payment.expiredAt)}</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <StatusBadge status={payment.status === "menunggu_pembayaran" ? "belum_bayar" : payment.status} />
+                            {order.status === "pending" && payment.status === "menunggu_konfirmasi" && (
+                              <VerifyOrderPaymentButton paymentId={payment.id} />
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-zinc-500">Pesanan ini belum memiliki tagihan.</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         {/* Daftar penghuni */}
@@ -201,6 +252,42 @@ export default function AdminDashboard({ overview }: { overview: AdminOverview }
           )}
         </section>
       </main>
+    </div>
+  );
+}
+
+function VerifyOrderPaymentButton({ paymentId }: { paymentId: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function verify() {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/payments/${paymentId}/confirm`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? "Gagal memverifikasi pembayaran");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="text-right">
+      <button
+        type="button"
+        onClick={verify}
+        disabled={loading}
+        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+      >
+        <Check size={16} />
+        {loading ? "Memproses..." : "Setujui pembayaran"}
+      </button>
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
 }

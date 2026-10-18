@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import UserDashboard from "@/components/dashboard/UserDashboard";
-import { requireUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { getUserDashboard } from "@/lib/data";
 
 type Props = { searchParams: Promise<{ kos?: string }> };
@@ -16,7 +16,9 @@ export default function DashboardPage(props: Props) {
 
 async function DashboardContent({ searchParams }: Props) {
   const { kos } = await searchParams;
-  const session = await requireUser();
+  const session = await getSession();
+  if (!session) redirect("/login");
+  if (session.role !== "client") redirect("/admin");
   const data = await getUserDashboard(session.id);
   if (!data) redirect("/login");
 

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import AdminDashboard from "@/components/admin/AdminDashboard";
-import { requireAdmin } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { getAdminOverview } from "@/lib/data";
 
 export default function AdminPage() {
@@ -12,7 +13,9 @@ export default function AdminPage() {
 }
 
 async function AdminContent() {
-  await requireAdmin();
-  const overview = await getAdminOverview();
+  const session = await getSession();
+  if (!session) redirect("/admin/login");
+  if (session.role !== "owner") redirect("/dashboard");
+  const overview = await getAdminOverview(session.id);
   return <AdminDashboard overview={overview} />;
 }
