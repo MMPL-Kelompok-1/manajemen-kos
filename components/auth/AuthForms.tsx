@@ -16,7 +16,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
 
   const isRegister = tab === "daftar";
   const inputClass =
-    "mt-1.5 w-full rounded-xl border border-zinc-200 px-4 py-3 text-base outline-none focus:border-zinc-950 sm:text-sm";
+    "mt-1.5 w-full rounded-xl border border-ctp-surface0 px-4 py-3 text-base outline-none focus:border-ctp-accent sm:text-sm";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,8 +47,8 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
 
   return (
     <div className="mx-auto w-full max-w-md px-5 py-12 sm:py-20">
-      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
-        <div className="grid grid-cols-2 rounded-full bg-zinc-100 p-1 text-sm font-semibold">
+      <div className="rounded-3xl border border-ctp-surface0 bg-ctp-base p-6 shadow-sm sm:p-8">
+        <div className="grid grid-cols-2 rounded-full bg-ctp-mantle p-1 text-sm font-semibold">
           {(["masuk", "daftar"] as Tab[]).map((value) => (
             <button
               key={value}
@@ -58,7 +58,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
                 setError("");
               }}
               className={`rounded-full py-2.5 capitalize transition ${
-                tab === value ? "bg-white shadow-sm" : "text-zinc-500"
+                tab === value ? "bg-ctp-base shadow-sm" : "text-ctp-subtext0"
               }`}
             >
               {value === "masuk" ? "Masuk" : "Daftar"}
@@ -67,7 +67,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
         </div>
 
         {kosId && (
-          <p className="mt-5 rounded-xl bg-zinc-50 p-3 text-sm text-zinc-600">
+          <p className="mt-5 rounded-xl bg-ctp-base p-3 text-sm text-ctp-subtext0">
             Setelah {isRegister ? "mendaftar" : "masuk"}, kos pilihan Anda akan diproses untuk pembayaran.
           </p>
         )}
@@ -133,7 +133,7 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+            <p role="alert" className="rounded-xl bg-ctp-red/10 p-3 text-sm text-ctp-red">
               {error}
             </p>
           )}
@@ -141,16 +141,16 @@ export default function AuthForms({ initialTab, kosId }: { initialTab: Tab; kosI
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-zinc-950 py-3 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="w-full rounded-full bg-ctp-accent py-3 font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text disabled:opacity-50"
           >
             {loading ? "Memproses..." : isRegister ? "Daftar akun" : "Masuk"}
           </button>
         </form>
       </div>
 
-      <p className="mt-6 text-center text-sm text-zinc-500">
+      <p className="mt-6 text-center text-sm text-ctp-subtext0">
         Pemilik kos?{" "}
-        <Link href="/admin/login" className="font-semibold text-zinc-950 underline">
+        <Link href="/admin/login" className="font-semibold text-ctp-text underline">
           Masuk sebagai admin
         </Link>
       </p>

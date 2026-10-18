@@ -6,7 +6,7 @@ import { getAdminOverview } from "@/lib/data";
 
 export default function AdminPage() {
   return (
-    <Suspense fallback={<div className="min-h-[100svh] bg-zinc-50" />}>
+    <Suspense fallback={<div className="min-h-[100svh] bg-ctp-base" />}>
       <AdminContent />
     </Suspense>
   );

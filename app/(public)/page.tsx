@@ -9,7 +9,7 @@ export default function HomePage() {
     <>
       <Hero />
       <WhyChooseUs />
-      <Suspense fallback={<p className="px-6 py-20 text-center text-zinc-400 md:py-24">Memuat daftar kos…</p>}>
+      <Suspense fallback={<p className="px-6 py-20 text-center text-ctp-overlay1 md:py-24">Memuat daftar kos…</p>}>
         <KosSection />
       </Suspense>
     </>

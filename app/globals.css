@@ -1,9 +1,29 @@
 @import "tailwindcss";
+@import "@catppuccin/tailwindcss/mocha.css";
+
+:root {
+  @apply bg-ctp-base text-ctp-text;
+}
 
 @theme {
   --font-sans: Ubuntu, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-ctp-accent: var(--catppuccin-color-accent);
+  --color-ctp-on-lavender: var(--catppuccin-color-on-lavender);
+}
+
+@layer base {
+  :root {
+    --catppuccin-color-accent: var(--catppuccin-color-lavender-800);
+    --catppuccin-color-on-lavender: #ffffff;
+  }
+
+  .mocha {
+    --catppuccin-color-accent: var(--catppuccin-color-lavender-400);
+    --catppuccin-color-on-lavender: #11111b;
+  }
 }
 
 html {
+  color-scheme: light dark;
   scroll-behavior: smooth;
 }
