@@ -20,7 +20,7 @@
 
   .mocha {
     --catppuccin-color-accent: var(--catppuccin-color-lavender-400);
-    --catppuccin-color-on-lavender: #123458;
+    --catppuccin-color-on-lavender: #11111b;
   }
 }
 
