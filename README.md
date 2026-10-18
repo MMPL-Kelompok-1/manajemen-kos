@@ -1,4 +1,4 @@
-# StayEase — Situs Pencarian, Pembayaran & Dashboard Kos
+# KosanKu — Situs Pencarian, Pembayaran & Dashboard Kos
 
 Frontend dan backend dalam satu proyek Next.js 16 (App Router).
 
@@ -12,7 +12,7 @@ npm run build && npm start    # mode produksi
 ```
 
 Di development, jika `ADMIN_EMAIL` / `ADMIN_PASSWORD` kosong, admin memakai
-`admin@stayease.local` / `admin12345`. Di production variabel ini wajib diisi,
+`admin@KosanKu.local` / `admin12345`. Di production variabel ini wajib diisi,
 dan `SESSION_SECRET` wajib diisi (tanpanya login akan gagal dengan error).
 
 ## Halaman

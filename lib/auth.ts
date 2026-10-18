@@ -54,7 +54,7 @@ export function withSession(response: NextResponse, id: string, role: Role): Nex
 // Kredensial admin dari environment. Di development ada nilai default; di production wajib diatur.
 export function checkAdminCredentials(email: string, password: string): boolean {
   const isDev = process.env.NODE_ENV !== "production";
-  const adminEmail = process.env.ADMIN_EMAIL ?? (isDev ? "admin@stayease.local" : "");
+  const adminEmail = process.env.ADMIN_EMAIL ?? (isDev ? "admin@KosanKu.local" : "");
   const adminPassword = process.env.ADMIN_PASSWORD ?? (isDev ? "admin12345" : "");
   if (!adminEmail || !adminPassword) return false;
   return (

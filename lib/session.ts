@@ -2,7 +2,7 @@
 // Aman dipakai di Route Handler maupun Server Component (tidak mengakses cookies() sendiri).
 import { createHmac, timingSafeEqual } from "crypto";
 
-export const SESSION_COOKIE = "stayease_session";
+export const SESSION_COOKIE = "KosanKu_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
 
 export type Role = "admin" | "user";

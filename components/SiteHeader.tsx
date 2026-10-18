@@ -20,7 +20,7 @@ export default function SiteHeader() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white">
             <Search size={16} />
           </span>
-          StayEase
+          KosanKu
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm text-zinc-600 md:flex">

@@ -68,7 +68,7 @@ export default function UserDashboard({ data, pendingKosId }: Props) {
     <div className="min-h-[100svh] bg-zinc-50">
       <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between gap-3 px-4">
-          <Link href="/" className="text-lg font-bold">StayEase</Link>
+          <Link href="/" className="text-lg font-bold">KosanKu</Link>
           <LogoutButton />
         </div>
       </header>

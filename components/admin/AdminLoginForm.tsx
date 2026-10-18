@@ -39,7 +39,7 @@ export default function AdminLoginForm() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white">
             <ShieldCheck size={16} />
           </span>
-          StayEase Admin
+          Kosanku Admin
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl bg-white p-6 shadow-sm sm:p-8">

@@ -4,7 +4,7 @@ import "./globals.css";
 // Font: memakai Ubuntu jika terpasang di perangkat, lalu fallback sistem.
 // Untuk memuat Ubuntu otomatis, gunakan next/font/google (lihat README).
 export const metadata: Metadata = {
-  title: "StayEase — Find Your Perfect Sanctuary",
+  title: "KosanKu — Find Your Perfect Sanctuary",
   description: "Temukan kos nyaman dengan harga yang jelas dan pembayaran yang mudah.",
 };
 
