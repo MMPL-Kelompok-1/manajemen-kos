@@ -37,7 +37,7 @@ async function DetailKos({ params }: { params: Promise<{ id: string }> }) {
     <main className="mx-auto max-w-7xl px-5 py-8 md:px-6 md:py-12">
       <Link
         href="/#kos"
-        className="inline-flex items-center gap-2 text-sm font-medium text-ctp-subtext0 hover:text-ctp-text"
+        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={16} /> Kembali ke daftar kos
       </Link>
@@ -50,8 +50,8 @@ async function DetailKos({ params }: { params: Promise<{ id: string }> }) {
           <h2 className="mt-10 text-xl font-bold">Spesifikasi</h2>
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">
             {specs.map(([label, value]) => (
-              <div key={label} className="border-b border-ctp-surface0 pb-3">
-                <dt className="text-sm text-ctp-subtext0">{label}</dt>
+              <div key={label} className="border-b border-border pb-3">
+                <dt className="text-sm text-muted-foreground">{label}</dt>
                 <dd className="font-semibold">{value}</dd>
               </div>
             ))}
@@ -60,44 +60,44 @@ async function DetailKos({ params }: { params: Promise<{ id: string }> }) {
           <h2 className="mt-10 text-xl font-bold">Fasilitas</h2>
           <ul className="mt-4 flex flex-wrap gap-2">
             {kos.facilities.map((item) => (
-              <li key={item} className="rounded-full border border-ctp-surface0 px-4 py-1.5 text-sm">
+              <li key={item} className="rounded-full border border-border px-4 py-1.5 text-sm">
                 {item}
               </li>
             ))}
           </ul>
 
           <h2 className="mt-10 text-xl font-bold">Deskripsi</h2>
-          <p className="mt-4 leading-relaxed text-ctp-subtext0">{kos.description}</p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">{kos.description}</p>
         </div>
 
         {/* Kolom kanan: ringkasan harga dan tombol daftar */}
-        <aside className="h-fit rounded-3xl border border-ctp-surface0 p-6 lg:sticky lg:top-24">
+        <aside className="h-fit rounded-3xl border border-border p-6 lg:sticky lg:top-24">
           <div className="flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold tracking-tight">{kos.name}</h1>
-            <span className="shrink-0 rounded-full bg-ctp-mantle px-3 py-1 text-xs font-semibold">
+            <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-semibold">
               {kos.gender}
             </span>
           </div>
-          <p className="mt-1 flex items-center gap-1 text-sm text-ctp-subtext0">
+          <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
             <MapPin size={14} /> {kos.area}
           </p>
 
           <p className="mt-6 text-3xl font-bold">
             {formatRupiah(kos.price)}
-            <span className="text-sm font-normal text-ctp-subtext0"> / bulan</span>
+            <span className="text-sm font-normal text-muted-foreground"> / bulan</span>
           </p>
-          <p className="mt-1 text-sm text-ctp-subtext0">
+          <p className="mt-1 text-sm text-muted-foreground">
             {full ? "Kamar penuh" : `Sisa ${kos.roomsLeft} kamar`}
           </p>
 
           {full ? (
-            <span className="mt-6 block rounded-full bg-ctp-surface0 py-3 text-center text-sm font-medium text-ctp-subtext0">
+            <span className="mt-6 block rounded-full bg-muted py-3 text-center text-sm font-medium text-muted-foreground">
               Kamar penuh
             </span>
           ) : (
             <Link
               href={`/login?tab=daftar&kos=${encodeURIComponent(kos.id)}`}
-              className="mt-6 block rounded-full bg-ctp-accent py-3 text-center text-sm font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text"
+              className="mt-6 block rounded-full bg-primary py-3 text-center text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
             >
               Pilih & daftar
             </Link>

@@ -20,7 +20,7 @@ export default function LogoutButton({ redirectTo = "/" }: { redirectTo?: string
       type="button"
       onClick={logout}
       disabled={loading}
-      className="flex items-center gap-2 rounded-full border border-ctp-surface0 px-3 py-2 text-sm font-medium hover:bg-ctp-base disabled:opacity-50"
+      className="flex items-center gap-2 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
     >
       <LogOut size={16} />
       <span>{loading ? "Keluar..." : "Keluar"}</span>

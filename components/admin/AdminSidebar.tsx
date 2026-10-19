@@ -38,7 +38,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full bg-zinc-50 text-zinc-900">
+        <div className="relative flex min-h-screen w-full bg-muted text-foreground">
             {/* Mobile Backdrop */}
             {isMobileOpen && (
                 <div
@@ -49,20 +49,20 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
 
             {/* Sidebar kiri - Posisi tetap (sticky h-screen) di desktop */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-zinc-200 bg-zinc-100 transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 overflow-y-auto ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 overflow-y-auto ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                     } ${isOpen ? "w-64" : "lg:w-16"}`}
             >
                 {/* Header Sidebar */}
-                <div className="flex h-14 shrink-0 items-center border-b border-zinc-200/70 px-4">
+                <div className="flex h-14 shrink-0 items-center border-b border-border px-4">
                     {isOpen ? (
                         <div className="flex items-center gap-2">
-                            <span className="flex size-7 items-center justify-center rounded-lg bg-zinc-950 text-xs font-bold text-white">
+                            <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
                                 K
                             </span>
-                            <span className="font-bold text-zinc-900">KosanKu</span>
+                            <span className="font-bold text-foreground">KosanKu</span>
                         </div>
                     ) : (
-                        <span className="mx-auto flex size-7 items-center justify-center rounded-lg bg-zinc-950 text-xs font-bold text-white">
+                        <span className="mx-auto flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
                             K
                         </span>
                     )}
@@ -73,8 +73,8 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     <Link
                         href="/admin"
                         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin"
-                                ? "bg-zinc-200 text-zinc-950 font-semibold"
-                                : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                                ? "bg-muted text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                         title="Dashboard"
                     >
@@ -85,8 +85,8 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     <Link
                         href="/admin"
                         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/kos"
-                                ? "bg-zinc-200 text-zinc-950 font-semibold"
-                                : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                                ? "bg-muted text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                         title="Manajemen Kos & Kamar"
                     >
@@ -97,8 +97,8 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     <Link
                         href="/admin"
                         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/penghuni"
-                                ? "bg-zinc-200 text-zinc-950 font-semibold"
-                                : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                                ? "bg-muted text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                         title="Manajemen Penghuni"
                     >
@@ -109,8 +109,8 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     <Link
                         href="/admin"
                         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/transaksi"
-                                ? "bg-zinc-200 text-zinc-950 font-semibold"
-                                : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                                ? "bg-muted text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                         title="Transaksi & Riwayat Pembayaran"
                     >
@@ -121,8 +121,8 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     <Link
                         href="/admin"
                         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === "/admin/laporan"
-                                ? "bg-zinc-200 text-zinc-950 font-semibold"
-                                : "text-zinc-600 hover:bg-zinc-200/70 hover:text-zinc-900"
+                                ? "bg-muted text-foreground font-semibold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                         title="Laporan Keuangan & Rekapitulasi"
                     >
@@ -135,7 +135,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
             {/* Konten Kanan: Top Navbar + Children */}
             <div className="flex flex-1 flex-col min-w-0">
                 {/* Top Navbar */}
-                <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-200/90 px-4 sm:px-6 backdrop-blur">
+                <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/90 px-4 sm:px-6 backdrop-blur">
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
@@ -146,7 +146,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                                     toggleDesktopSidebar();
                                 }
                             }}
-                            className="inline-flex size-9 items-center justify-center rounded-lg text-zinc-700 hover:bg-zinc-300 transition-colors"
+                            className="inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-border transition-colors"
                             aria-label="Toggle sidebar"
                         >
                             {/* Sidebar toggle icon */}
@@ -165,7 +165,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                                 <path d="M14 10l2 2l-2 2"></path>
                             </svg>
                         </button>
-                        <span className="font-semibold text-zinc-900">Dashboard Admin</span>
+                        <span className="font-semibold text-foreground">Dashboard Admin</span>
                     </div>
 
                     <div className="flex items-center gap-3">

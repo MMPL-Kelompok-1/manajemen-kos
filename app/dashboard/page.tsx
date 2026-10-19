@@ -8,7 +8,7 @@ type Props = { searchParams: Promise<{ kos?: string }> };
 
 export default function DashboardPage(props: Props) {
   return (
-    <Suspense fallback={<div className="min-h-[100svh] bg-ctp-base" />}>
+    <Suspense fallback={<div className="min-h-[100svh] bg-background" />}>
       <DashboardContent {...props} />
     </Suspense>
   );

@@ -33,19 +33,19 @@ export default function AdminLoginForm() {
   }
 
   return (
-    <main className="flex min-h-[100svh] items-center justify-center bg-ctp-base px-5 py-10">
+    <main className="flex min-h-[100svh] items-center justify-center bg-background px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-center gap-2 text-lg font-bold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-ctp-accent text-ctp-on-lavender">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <ShieldCheck size={16} />
           </span>
           Kosanku Admin
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl bg-ctp-base p-6 shadow-sm sm:p-8">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-3xl bg-card p-6 shadow-sm sm:p-8">
           <div>
             <h1 className="text-xl font-bold">Masuk pemilik kos</h1>
-            <p className="mt-1 text-sm text-ctp-subtext0">Pantau penghuni dan konfirmasi pembayaran.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Pantau penghuni dan konfirmasi pembayaran.</p>
           </div>
 
           <label className="block text-sm font-semibold">
@@ -56,7 +56,7 @@ export default function AdminLoginForm() {
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-ctp-surface0 px-4 py-3 text-base outline-none focus:border-ctp-accent sm:text-sm"
+              className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 text-base outline-none focus:border-primary bg-muted sm:text-sm"
             />
           </label>
           <label className="block text-sm font-semibold">
@@ -67,12 +67,12 @@ export default function AdminLoginForm() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-ctp-surface0 px-4 py-3 text-base outline-none focus:border-ctp-accent sm:text-sm"
+              className="mt-1.5 w-full rounded-xl border border-border px-4 py-3 text-base outline-none focus:border-primary bg-muted sm:text-sm"
             />
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-ctp-red/10 p-3 text-sm text-ctp-red">
+            <p role="alert" className="rounded-xl bg-red-3 p-3 text-sm text-red-11">
               {error}
             </p>
           )}
@@ -80,14 +80,14 @@ export default function AdminLoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-ctp-accent py-3 font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text disabled:opacity-50"
+            className="w-full rounded-full bg-primary py-3 font-medium text-primary-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
           >
             {loading ? "Memproses..." : "Masuk"}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Penghuni?{" "}
-          <Link href="/" className="font-semibold text-zinc-950 underline">
+          <Link href="/" className="font-semibold text-foreground underline">
             Masuk di sini
           </Link>
         </p>

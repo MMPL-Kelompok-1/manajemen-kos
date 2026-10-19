@@ -25,7 +25,7 @@ export default function ListingImage({
   if (!src || failed) {
     return (
       <div
-        className={`flex h-full w-full items-center justify-center bg-ctp-surface0 px-3 text-center text-sm text-ctp-subtext0 ${className}`}
+        className={`flex h-full w-full items-center justify-center bg-muted px-3 text-center text-sm text-muted-foreground ${className}`}
       >
         {alt}
       </div>

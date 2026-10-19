@@ -34,7 +34,7 @@ export default function AuthForms({
 
   const isRegister = tab === "daftar";
   const inputClass =
-    "mt-1.5 w-full rounded-2xl border border-zinc-200/80 bg-[#edf3fc] px-4 py-3 text-base text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white sm:text-sm";
+    "mt-1.5 w-full rounded-2xl border border-border bg-muted px-4 py-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:bg-card sm:text-sm";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -69,19 +69,19 @@ export default function AuthForms({
 
   return (
     <div className={isModal ? "w-full" : "mx-auto w-full max-w-md px-5 py-12 sm:py-20"}>
-      <div className="relative rounded-3xl border border-zinc-200/80 bg-white p-6 shadow-xl sm:p-8">
+      <div className="relative rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
         {isModal && onClose && (
           <button
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-800 sm:right-6 sm:top-6"
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground sm:right-6 sm:top-6"
           >
             <X size={20} />
           </button>
         )}
 
-        <div className={`grid grid-cols-2 rounded-full bg-zinc-100 p-1 text-sm font-semibold ${isModal ? "pr-8 sm:pr-0" : ""}`}>
+        <div className={`grid grid-cols-2 rounded-full bg-muted p-1 text-sm font-semibold ${isModal ? "pr-8 sm:pr-0" : ""}`}>
           {(["masuk", "daftar"] as Tab[]).map((value) => (
             <button
               key={value}
@@ -90,7 +90,7 @@ export default function AuthForms({
                 setTab(value);
                 setError("");
               }}
-              className={`rounded-full py-2.5 capitalize transition ${tab === value ? "bg-white text-zinc-950 shadow-sm" : "text-zinc-500 hover:text-zinc-800"
+              className={`rounded-full py-2.5 capitalize transition ${tab === value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
             >
               {value === "masuk" ? "Masuk" : "Daftar"}
@@ -99,7 +99,7 @@ export default function AuthForms({
         </div>
 
         {kosId && (
-          <p className="mt-5 rounded-xl bg-ctp-base p-3 text-sm text-ctp-subtext0">
+          <p className="mt-5 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
             Setelah {isRegister ? "mendaftar" : "masuk"}, kos pilihan Anda akan diproses untuk pembayaran.
           </p>
         )}
@@ -107,7 +107,7 @@ export default function AuthForms({
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {isRegister && (
             <>
-              <label className="block text-sm font-semibold text-zinc-900">
+              <label className="block text-sm font-semibold text-foreground">
                 Nama lengkap
                 <input
                   required
@@ -119,7 +119,7 @@ export default function AuthForms({
                   className={inputClass}
                 />
               </label>
-              <label className="block text-sm font-semibold text-zinc-900">
+              <label className="block text-sm font-semibold text-foreground">
                 Nomor HP
                 <input
                   required
@@ -135,7 +135,7 @@ export default function AuthForms({
             </>
           )}
 
-          <label className="block text-sm font-semibold text-zinc-900">
+          <label className="block text-sm font-semibold text-foreground">
             Gmail
             <input
               required
@@ -151,7 +151,7 @@ export default function AuthForms({
             />
           </label>
 
-          <label className="block text-sm font-semibold text-zinc-900">
+          <label className="block text-sm font-semibold text-foreground">
             Kata sandi
             <input
               required
@@ -166,7 +166,7 @@ export default function AuthForms({
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-ctp-red/10 p-3 text-sm text-ctp-red">
+            <p role="alert" className="rounded-xl bg-red-3 p-3 text-sm text-red-11">
               {error}
             </p>
           )}
@@ -174,19 +174,19 @@ export default function AuthForms({
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-ctp-accent py-3 font-medium text-ctp-on-lavender hover:bg-ctp-mantle hover:text-ctp-text disabled:opacity-50"
+            className="w-full rounded-full bg-primary py-3 font-medium text-primary-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
           >
             {loading ? "Memproses..." : isRegister ? "Daftar akun" : "Masuk"}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Pemilik kos?{" "}
           <Link
             href="/admin/login"
             onClick={() => {
               if (isModal && onClose) onClose();
             }}
-            className="font-semibold text-zinc-950 underline"
+            className="font-semibold text-foreground underline"
           >
             Masuk sebagai admin
           </Link>

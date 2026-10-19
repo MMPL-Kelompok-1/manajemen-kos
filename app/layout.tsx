@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ThemeToggle from "@/components/ThemeToggle";
 
 // Font: memakai Ubuntu jika terpasang di perangkat, lalu fallback sistem.
@@ -24,8 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-ctp-base text-ctp-text">
+    <html lang="id" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("kosanku-theme");var isDark=t==="dark"||t==="mocha"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);var root=document.documentElement;if(isDark){root.classList.add("dark","dark-theme");root.style.colorScheme="dark";}else{root.classList.add("light","light-theme");root.style.colorScheme="light";}}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
         <ThemeToggle />
       </body>
