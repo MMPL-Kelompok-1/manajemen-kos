@@ -14,7 +14,7 @@ export default function AdminPage() {
 
 async function AdminContent() {
   const session = await getSession();
-  if (!session) redirect("/admin/login");
+  if (!session) redirect("/login");
   if (session.role !== "owner") redirect("/dashboard");
   const overview = await getAdminOverview(session.id);
   return <AdminDashboard overview={overview} />;

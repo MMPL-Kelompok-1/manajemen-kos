@@ -169,7 +169,7 @@ export default function AdminSidebar({ children }: AdminSidebarProps) {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <LogoutButton redirectTo="/admin/login" />
+                        <LogoutButton redirectTo="/login" />
                     </div>
                 </header>
 

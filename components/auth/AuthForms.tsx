@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, type FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 
@@ -43,7 +42,7 @@ export default function AuthForms({
 
     const body = isRegister
       ? { name: form.name, phone: form.phone, email: form.email, password: form.password }
-      : { role: "client", email: form.email, password: form.password };
+      : { email: form.email, password: form.password };
 
     try {
       const res = await fetch(isRegister ? "/api/auth/register" : "/api/auth/login", {
@@ -58,7 +57,12 @@ export default function AuthForms({
         onClose();
       }
 
-      const target = kosId ? `/dashboard?kos=${encodeURIComponent(kosId)}` : "/dashboard";
+      const target =
+        data.role === "owner"
+          ? "/admin"
+          : kosId
+            ? `/dashboard?kos=${encodeURIComponent(kosId)}`
+            : "/dashboard";
       router.replace(target);
       router.refresh();
     } catch (err) {
@@ -180,16 +184,7 @@ export default function AuthForms({
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Pemilik kos?{" "}
-          <Link
-            href="/admin/login"
-            onClick={() => {
-              if (isModal && onClose) onClose();
-            }}
-            className="font-semibold text-foreground underline"
-          >
-            Masuk sebagai admin
-          </Link>
+          Admin dan penghuni menggunakan halaman masuk yang sama.
         </p>
       </div>
 

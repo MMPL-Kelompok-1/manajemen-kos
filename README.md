@@ -20,9 +20,9 @@ dan `SESSION_SECRET` wajib diisi (tanpanya login akan gagal dengan error).
 | Halaman | Untuk | Keterangan |
 | --- | --- | --- |
 | `/` | Umum | Landing page, daftar kos, spesifikasi, dan foto |
-| `/login` | Penghuni / calon penghuni | Masuk atau daftar akun (Gmail + kata sandi) |
+| `/login` | Admin, penghuni / calon penghuni | Masuk atau daftar; admin diarahkan otomatis ke dashboard admin |
 | `/dashboard` | Penghuni | Kos, nomor kamar, status, tanggal bayar, jatuh tempo, rekening, "Saya sudah membayar", perpanjangan |
-| `/admin/login` | Admin (pemilik kos) | Masuk memakai kredensial admin |
+| `/admin/login` | - | URL lama yang diarahkan ke halaman login bersama |
 | `/admin` | Admin | Ringkasan, daftar penghuni, nomor kamar, konfirmasi pembayaran lunas |
 
 Alur penghuni: pilih kos di landing page → "Pilih & daftar" → daftar atau masuk →
@@ -46,7 +46,7 @@ Aturan bisnis:
 
 ```
 POST /api/auth/register              { name, phone, email, password }   (penghuni)
-POST /api/auth/login                 { role: "user" | "admin", email, password }
+POST /api/auth/login                 { email, password }                 (admin atau penghuni)
 POST /api/auth/logout
 POST /api/payments                   { kosId }                          (penghuni)
 POST /api/payments/:id/paid                                             (penghuni, tagihan sendiri)
@@ -63,7 +63,7 @@ app/
   (public)/page.tsx                 Landing page
   (public)/login/page.tsx           Login & daftar penghuni
   dashboard/page.tsx                Dashboard penghuni (wajib masuk)
-  admin/login/page.tsx              Login admin
+  admin/login/page.tsx              Redirect ke login bersama
   admin/page.tsx                    Dashboard admin (wajib masuk admin)
   api/...                           Route handler (lihat daftar API)
 components/
@@ -72,7 +72,6 @@ components/
   auth/AuthForms.tsx, auth/LogoutButton.tsx
   dashboard/UserDashboard.tsx       Tampilan penghuni
   admin/AdminDashboard.tsx          Tabel (desktop) & kartu (HP) penghuni
-  admin/AdminLoginForm.tsx
 lib/
   data.ts                           Logika data & aturan bisnis (backend)
   auth.ts                           Pemeriksaan sesi untuk halaman & API

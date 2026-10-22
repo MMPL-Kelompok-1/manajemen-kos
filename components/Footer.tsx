@@ -77,11 +77,11 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/admin/login"
+                  href="/login"
                   className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
                 >
                   <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Login pemilik kos
+                  Masuk
                 </Link>
               </li>
             </ul>

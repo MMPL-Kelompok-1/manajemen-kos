@@ -32,7 +32,7 @@ export async function requireUser(): Promise<Session> {
 // Untuk halaman: alihkan ke login pemilik bila bukan owner.
 export async function requireAdmin(): Promise<Session> {
   const session = await getSession();
-  if (!session || session.role !== "owner") redirect("/admin/login");
+  if (!session || session.role !== "owner") redirect("/login");
   return session;
 }
 

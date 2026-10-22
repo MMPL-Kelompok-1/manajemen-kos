@@ -212,12 +212,16 @@ export async function authenticateUser(input: Record<string, unknown>): Promise<
 
 export async function authenticateAccount(
   input: Record<string, unknown>,
-  expectedRole: Role,
+  expectedRole?: Role,
 ): Promise<AccountInfo> {
   const email = cleanString(input.email).toLowerCase();
   const password = typeof input.password === "string" ? input.password : "";
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || user.role !== expectedRole || !(await verifyPassword(password, user.password))) {
+  if (
+    !user ||
+    (expectedRole && user.role !== expectedRole) ||
+    !(await verifyPassword(password, user.password))
+  ) {
     throw new ApiError("Gmail atau kata sandi salah", 401);
   }
   return toAccount(user);
