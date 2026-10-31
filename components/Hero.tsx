@@ -7,7 +7,7 @@ export default function Hero() {
 
   return (
     <section
-      id="top"
+      id="home"
       className="relative w-full min-h-[calc(100vh-4rem)] bg-background text-foreground flex items-center overflow-hidden"
       style={{
         backgroundImage: "url('/images/hero.jpg')",

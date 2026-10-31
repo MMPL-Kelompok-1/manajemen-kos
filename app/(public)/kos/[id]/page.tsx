@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
-import KosGallery from "@/components/KosGallery";
+import ProductGallery from "@/components/ProductGallery";
 import { formatRupiah } from "@/lib/format";
 // TODO: ganti getKosList dengan fungsi yang dipakai app/(public)/page.tsx
 // untuk mengambil daftar kos dari "@/lib/data".
@@ -11,12 +11,12 @@ import { getKosList } from "@/lib/data";
 export default function DetailKosPage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <Suspense fallback={<div className="mx-auto max-w-7xl px-5 py-16 md:px-6">Memuat...</div>}>
-      <DetailKos params={params} />
+      <DetailProduct params={params} />
     </Suspense>
   );
 }
 
-async function DetailKos({ params }: { params: Promise<{ id: string }> }) {
+async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const kosList = await getKosList();
   const kos = kosList.find((item) => item.id === decodeURIComponent(id));
@@ -45,7 +45,7 @@ async function DetailKos({ params }: { params: Promise<{ id: string }> }) {
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
         {/* Kolom kiri: foto, spesifikasi, fasilitas, deskripsi */}
         <div>
-          <KosGallery photos={kos.photos} name={kos.name} />
+          <ProductGallery photos={kos.photos} name={kos.name} />
 
           <h2 className="mt-10 text-xl font-bold">Spesifikasi</h2>
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">

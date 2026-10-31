@@ -1,8 +1,8 @@
 import { Clock, Headset, ShieldCheck, Star, Zap } from "lucide-react";
 
-export default function WhyChooseUs() {
+export default function About() {
   return (
-    <section id="why" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
+    <section id="about" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
           <p className="text-sm font-bold uppercase tracking-wider">Why choose us</p>

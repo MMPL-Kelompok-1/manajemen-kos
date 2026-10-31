@@ -49,37 +49,26 @@ model User {
   password  String
   phone     String
   role      RoleEnum
-  kos       Kos[]      @relation("KosOwner")
   orders    Order[]    @relation("OrderClient")
   reviews   Review[]   @relation("ReviewClient")
   reminders Reminder[] @relation("ReminderClient")
 }
 
-model Kos {
-  id             String   @id @default(cuid())
-  name           String
-  address        String
-  phone          String
-  background_img String
-  owner_id       String
-  owner          User     @relation("KosOwner", fields: [owner_id], references: [id], onDelete: Restrict)
-  rooms          Room[]
-  reviews        Review[]
-
-  @@index([owner_id])
-}
-
 model Room {
   id          String         @id @default(cuid())
   room_number String
+  name        String?
+  area        String?
   price       Decimal        @db.Decimal(10, 2)
+  gender      String?
+  room_size   String?
+  bathroom    String?
+  description String?
   facilities  String[]
+  photos      String[]
   status      RoomStatusEnum
-  kos_id      String
-  kos         Kos            @relation(fields: [kos_id], references: [id], onDelete: Cascade)
   orders      Order[]
-
-  @@index([kos_id])
+  reviews     Review[]
 }
 
 model Order {
@@ -119,15 +108,15 @@ model Payment {
 
 model Review {
   id         String   @id @default(cuid())
-  kos_id     String
+  room_id    String
   rating     Int
   comment    String?
   created_at DateTime @default(now())
   client_id  String
-  kos        Kos      @relation(fields: [kos_id], references: [id], onDelete: Cascade)
+  room       Room     @relation(fields: [room_id], references: [id], onDelete: Cascade)
   client     User     @relation("ReviewClient", fields: [client_id], references: [id], onDelete: Restrict)
 
-  @@index([kos_id, created_at])
+  @@index([room_id, created_at])
   @@index([client_id])
 }
 

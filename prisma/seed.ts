@@ -6,7 +6,7 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Menjalankan seeder untuk skema B2B2C...');
+  console.log('Menjalankan seeder...');
   const ownerPassword = process.env.OWNER_PASSWORD;
   if (!ownerPassword) throw new Error('OWNER_PASSWORD harus diatur sebelum menjalankan seeder.');
   const ownerEmail = process.env.OWNER_EMAIL || 'owner@atmint.com';
@@ -36,33 +36,27 @@ async function main() {
 
   console.log(`✅ Owner berhasil dibuat: ${owner.email}`);
 
-  // 3. Mapping data dari kos.json ke relasi Kos dan Room
+  // 3. Mapping data langsung ke entitas Room (Kamar)
   for (const item of kosData) {
-    // Buat entitas properti Kos
-    const kos = await prisma.kos.create({
-      data: {
-        name: item.name,
-        address: item.address || 'Alamat tidak tersedia',
-        phone: '081234567890', // Dummy phone
-        background_img: item.photos && item.photos.length > 0 ? item.photos[0] : '',
-        owner_id: owner.id,
-      },
-    });
-
-    // Buat entitas Kamar di dalam Kos tersebut
     const statusKamar = item.roomsLeft > 0 ? RoomStatusEnum.available : RoomStatusEnum.occupied;
-    
+
     await prisma.room.create({
       data: {
-        room_number: `A-${Math.floor(Math.random() * 100)}`, // Generate nomor kamar acak
+        room_number: `A-${Math.floor(Math.random() * 100)}`,
+        name: item.name,
+        area: item.area || 'Dekat Kampus',
         price: item.price,
+        gender: item.gender || 'Campur',
+        room_size: item.roomSize || '3 x 4 m',
+        bathroom: item.bathroom || 'Dalam',
+        description: item.description || '',
         facilities: item.facilities || [],
+        photos: item.photos || [],
         status: statusKamar,
-        kos_id: kos.id,
       },
     });
 
-    console.log(`✅ Properti terdaftar: ${kos.name} beserta kamarnya.`);
+    console.log(`✅ Kamar terdaftar: ${item.name}`);
   }
 
   console.log('🌱 Seeding selesai!');
