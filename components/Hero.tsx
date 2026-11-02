@@ -31,7 +31,7 @@ export default function Hero() {
           </p>
           <div className="mt-10 flex flex-col items-start justify-start gap-3 sm:flex-row">
             <a
-              href="#kos"
+              href="#product"
               className="rounded-full bg-primary px-8 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Lihat kos

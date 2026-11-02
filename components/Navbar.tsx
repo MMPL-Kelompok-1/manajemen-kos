@@ -131,7 +131,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                href="/#product-gallery"
+                href="/#product"
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 Products

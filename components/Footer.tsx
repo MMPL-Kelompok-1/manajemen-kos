@@ -8,11 +8,24 @@ import { useAuthModal } from "@/components/auth/AuthModalContext";
 const EMAIL = "KosanKu@gmail.com";
 const TELEPON = "+62 1234 5678 9012";
 
+// Sama dengan menu di Navbar supaya tujuannya seragam.
+const menu = [
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Products", href: "/#product" },
+  { label: "Contact", href: "/#contact" },
+  { label: "FAQ", href: "/#faq" },
+];
+
 const cardClass =
   "rounded-3xl border border-primary-foreground/20 bg-primary-foreground/[.04] p-6 sm:p-8";
 const labelClass = "text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground";
 const ikonClass =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary-foreground/30 transition-colors";
+const linkClass =
+  "group inline-flex items-center gap-2 py-1.5 text-left text-primary-foreground/70 transition-colors hover:text-primary-foreground";
+const garisClass =
+  "h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground";
 
 export default function Footer() {
   const { openModal } = useAuthModal();
@@ -38,90 +51,37 @@ export default function Footer() {
           <nav aria-label="Menu footer" className={cardClass}>
             <p className={labelClass}>Menu</p>
             <ul className="mt-5 flex flex-col gap-1">
+              {menu.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className={linkClass}>
+                    <span className={garisClass} />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
               <li>
-                <Link
-                  href="/"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Beranda
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#beranda"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Beranda
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#tentang"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  tentang
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#contact"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Kontak
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#kos"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Kos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#kos"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
-                  Kos
-                </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => openModal("daftar")}
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground text-left"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
+                <button type="button" onClick={() => openModal("daftar")} className={linkClass}>
+                  <span className={garisClass} />
                   Daftar
                 </button>
               </li>
               <li>
-                <Link
-                  href="/login"
-                  className="group inline-flex items-center gap-2 py-1.5 text-primary-foreground/70 transition-colors hover:text-primary-foreground"
-                >
-                  <span className="h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground" />
+                <button type="button" onClick={() => openModal("masuk")} className={linkClass}>
+                  <span className={garisClass} />
                   Masuk
-                </Link>
+                </button>
               </li>
             </ul>
           </nav>
 
-          {/* Card Kontak */}
-          <div className={cardClass}>
+          {/* Card Kontak: tujuan link "Contact" di navbar */}
+          <div id="contact" className={`${cardClass} scroll-mt-20`}>
             <p className={labelClass}>Kontak</p>
             <ul className="mt-5 flex flex-col gap-4">
               <li>
                 <a
                   href={`mailto:${EMAIL}`}
-                  className="group flex items-center gap-3 text-primary-foreground transition-colors hover:text-primary-foreground"
+                  className="group flex items-center gap-3 text-primary-foreground"
                 >
                   <span className={`${ikonClass} group-hover:border-primary-foreground group-hover:bg-background group-hover:text-foreground`}>
                     <Mail size={17} />
@@ -132,7 +92,7 @@ export default function Footer() {
               <li>
                 <a
                   href={`tel:${TELEPON.replace(/\s/g, "")}`}
-                  className="group flex items-center gap-3 text-primary-foreground transition-colors hover:text-primary-foreground"
+                  className="group flex items-center gap-3 text-primary-foreground"
                 >
                   <span className={`${ikonClass} group-hover:border-primary-foreground group-hover:bg-background group-hover:text-foreground`}>
                     <Phone size={17} />
@@ -154,8 +114,8 @@ export default function Footer() {
         <div className="mt-8 flex items-center justify-between gap-4 pb-[env(safe-area-inset-bottom)] text-sm text-primary-foreground">
           <p>© KosanKu. All rights reserved.</p>
           <a
-            href="#"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-primary-foreground"
+            href="/#home"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-primary-foreground/70"
           >
             Ke atas <ArrowUp size={14} />
           </a>
