@@ -154,7 +154,10 @@ export default function Navbar() {
             <li>
               <Link
                 href="/#product"
+<<<<<<< HEAD
                 onClick={(e) => handleNavClick(e, "product")}
+=======
+>>>>>>> 2db62be14abb3a32b728180e758ec395fa26984a
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 Products
