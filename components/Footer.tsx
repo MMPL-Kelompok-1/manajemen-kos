@@ -18,7 +18,7 @@ export default function Footer() {
   const { openModal } = useAuthModal();
 
   return (
-    <footer className="border-t border-primary-foreground/20 bg-primary text-primary-foreground">
+    <footer id="contact" className="border-t border-primary-foreground/20 bg-primary text-primary-foreground scroll-mt-20">
       <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-6 md:pt-16">
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
           {/* Card KosanKu */}

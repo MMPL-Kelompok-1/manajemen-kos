@@ -80,8 +80,11 @@ function toAccount(
     roomNumber,
   };
 }
+type PaymentInput = Pick<PrismaPayment, "id" | "amount" | "status" | "method" | "paid_at" | "expired_at">;
+type OrderInput = Pick<PrismaOrder, "id" | "client_id" | "room_id" | "created_at" | "status">;
 
-function toPayment(payment: PrismaPayment, order: Pick<PrismaOrder, "id" | "client_id" | "room_id" | "created_at" | "status">): Payment {
+
+function toPayment(payment: PaymentInput, order: OrderInput): Payment {
   return {
     id: payment.id,
     registrationId: order.client_id,
@@ -496,24 +499,75 @@ export type AdminOrderRow = {
   payments: { id: string; amount: number; status: PaymentStatus; expiredAt: string }[];
 };
 
-export async function getAdminOverview(ownerId: string): Promise<AdminOverview> {
-  const owner = await prisma.user.findFirst({ where: { id: ownerId, role: "owner" } });
-  if (!owner) throw new ApiError("Unauthorized", 403);
 
-  const [users, rooms] = await Promise.all([
+export async function getAdminOverview(ownerId: string): Promise<AdminOverview> {
+  const [owner, users, rooms, recentOrders] = await Promise.all([
+    prisma.user.findFirst({
+      where: { id: ownerId, role: "owner" },
+      select: { id: true },
+    }),
     prisma.user.findMany({
-      where: {
-        role: "client",
-      },
-      include: {
+      where: { role: "client" },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
         orders: {
-          include: { room: true, payments: true },
           orderBy: { created_at: "asc" },
+          select: {
+            id: true,
+            status: true,
+            room: { select: { name: true, room_number: true } },
+            payments: {
+              select: {
+                id: true,
+                amount: true,
+                status: true,
+                method: true,
+                paid_at: true,
+                expired_at: true,
+              },
+            },
+          },
         },
       },
     }),
-    prisma.room.findMany(),
+    prisma.room.findMany({
+      select: { id: true, name: true, room_number: true, status: true, price: true },
+    }),
+    // Hanya 30 order terbaru untuk daftar "Pesanan masuk"
+    prisma.order.findMany({
+      where: { client: { role: "client" } },
+      orderBy: { created_at: "desc" },
+      take: 30,
+      select: {
+        id: true,
+        client_id: true,
+        room_id: true,
+        created_at: true,
+        status: true,
+        start_date: true,
+        end_date: true,
+        client: { select: { name: true, email: true } },
+        room: { select: { name: true, room_number: true } },
+        payments: {
+          select: {
+            id: true,
+            amount: true,
+            status: true,
+            method: true,
+            paid_at: true,
+            expired_at: true,
+          },
+        },
+      },
+    }),
   ]);
+  if (!owner) throw new ApiError("Unauthorized", 403);
+
+  const nowIso = new Date().toISOString();
+
   const rows: TenantRow[] = users.map((user) => {
     const orders = user.orders;
     const latestOrder = orders[orders.length - 1] ?? null;
@@ -538,7 +592,7 @@ export async function getAdminOverview(ownerId: string): Promise<AdminOverview> 
     const status: TenantStatus = !latestOrder || latestOrder.status === "cancelled"
       ? "belum_pilih_kos"
       : paymentStatus === "lunas"
-        ? lastPaidAt && addOneMonth(lastPaidAt) < new Date().toISOString()
+        ? lastPaidAt && addOneMonth(lastPaidAt) < nowIso
           ? "terlambat"
           : "lunas"
         : paymentStatus === "menunggu_konfirmasi"
@@ -563,28 +617,33 @@ export async function getAdminOverview(ownerId: string): Promise<AdminOverview> 
     };
   });
 
-  const orders: AdminOrderRow[] = users.flatMap((user) =>
-    user.orders.map((order) => ({
-      orderId: order.id,
-      clientName: user.name,
-      clientEmail: user.email,
-      kosName: order.room.name || `Kamar ${order.room.room_number}`,
-      roomNumber: order.room.room_number,
-      startDate: order.start_date.toISOString(),
-      endDate: order.end_date.toISOString(),
-      status: order.status,
-      payments: order.payments.map((payment) => ({
-        id: payment.id,
-        amount: payment.amount.toNumber(),
-        status: toPayment(payment, order).status,
-        expiredAt: payment.expired_at.toISOString(),
-      })),
-    }))
-  ).sort((left, right) => right.startDate.localeCompare(left.startDate));
+  const orders: AdminOrderRow[] = recentOrders.map((order) => ({
+    orderId: order.id,
+    clientName: order.client.name,
+    clientEmail: order.client.email,
+    kosName: order.room.name || `Kamar ${order.room.room_number}`,
+    roomNumber: order.room.room_number,
+    startDate: order.start_date.toISOString(),
+    endDate: order.end_date.toISOString(),
+    status: order.status,
+    payments: order.payments.map((payment) => ({
+      id: payment.id,
+      amount: payment.amount.toNumber(),
+      status: toPayment(payment, order).status,
+      expiredAt: payment.expired_at.toISOString(),
+    })),
+  }));
 
   rows.sort((a, b) => a.name.localeCompare(b.name, "id"));
-  const count = (status: TenantStatus) => rows.filter((row) => row.status === status).length;
-  
+
+  const stats = { lunas: 0, menungguKonfirmasi: 0, terlambat: 0, belumBayar: 0 };
+  for (const row of rows) {
+    if (row.status === "lunas") stats.lunas++;
+    else if (row.status === "menunggu_konfirmasi") stats.menungguKonfirmasi++;
+    else if (row.status === "terlambat") stats.terlambat++;
+    else if (row.status === "belum_bayar") stats.belumBayar++;
+  }
+
   const kosSummary: AdminOverview["kosSummary"] = rooms.map((room) => ({
     id: room.id,
     name: room.name || `Kamar ${room.room_number}`,
@@ -596,11 +655,8 @@ export async function getAdminOverview(ownerId: string): Promise<AdminOverview> 
     rows,
     orders,
     stats: {
-      lunas: count("lunas"),
-      menungguKonfirmasi: count("menunggu_konfirmasi"),
-      terlambat: count("terlambat"),
-      belumBayar: count("belum_bayar"),
-      totalKamarTersisa: rooms.filter((room) => room.status === RoomStatusEnum.available).length,
+      ...stats,
+      totalKamarTersisa: kosSummary.reduce((sum, kos) => sum + kos.roomsLeft, 0),
     },
     kosSummary,
   };

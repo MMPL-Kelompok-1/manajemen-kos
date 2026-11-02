@@ -6,7 +6,7 @@ import ListingImage from "@/components/ListingImage";
 import { formatRupiah } from "@/lib/format";
 import type { Kos } from "@/lib/data";
 
-export default function KosExplorer({ items = [] }: { items?: Kos[] }) {
+export default function ProductExplorer({ items = [] }: { items?: Kos[] }) {
   return (
     <section id="product" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
       {/* Header Section terpusat */}

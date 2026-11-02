@@ -52,6 +52,8 @@ model User {
   orders    Order[]    @relation("OrderClient")
   reviews   Review[]   @relation("ReviewClient")
   reminders Reminder[] @relation("ReminderClient")
+
+  @@index([role])
 }
 
 model Room {
@@ -69,6 +71,9 @@ model Room {
   status      RoomStatusEnum
   orders      Order[]
   reviews     Review[]
+
+  @@index([client_id, created_at])
+  @@index([room_id])
 }
 
 model Order {
@@ -104,6 +109,7 @@ model Payment {
   order                  Order             @relation(fields: [order_id], references: [id], onDelete: Restrict)
 
   @@index([order_id])
+  
 }
 
 model Review {

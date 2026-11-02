@@ -59,7 +59,7 @@ export default function AuthForms({
 
       const target =
         data.role === "owner"
-          ? "/admin"
+          ? "/admin/dashboard"
           : kosId
             ? `/dashboard?kos=${encodeURIComponent(kosId)}`
             : "/dashboard";
@@ -79,13 +79,13 @@ export default function AuthForms({
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground sm:right-6 sm:top-6"
+            className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         )}
 
-        <div className={`grid grid-cols-2 rounded-full bg-muted p-1 text-sm font-semibold ${isModal ? "pr-8 sm:pr-0" : ""}`}>
+        <div className={`grid grid-cols-2 rounded-full bg-muted p-1 text-sm font-semibold ${isModal ? "mt-5" : ""}`}>
           {(["masuk", "daftar"] as Tab[]).map((value) => (
             <button
               key={value}
@@ -191,3 +191,4 @@ export default function AuthForms({
     </div>
   );
 }
+

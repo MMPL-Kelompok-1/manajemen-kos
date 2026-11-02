@@ -10,6 +10,7 @@
 @import "@radix-ui/colors/blue.css";
 @import "@radix-ui/colors/blue-dark.css";
 
+/* --- TEMA GLOBAL AWAL ANDA --- */
 :root,
 .light,
 .light-theme {
@@ -21,6 +22,21 @@
   --border: var(--sand-6);
   --primary: var(--sand-12);
   --primary-foreground: var(--sand-1);
+
+  /* Mapping variabel UI KosanKu (Light Mode) */
+  --surface: #ffffff;
+  --surface-dim: #f3f3f5;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f8f9fa;
+  --surface-container: #f1f3f5;
+  --surface-container-high: #e9ecef;
+  --surface-container-highest: #e0e0e0;
+  --on-surface: #121212;
+  --on-surface-variant: #555555;
+  --outline: #888888;
+  --primary-container: #e2e8f0;
+  --on-primary-container: #0f172a;
 }
 
 .dark,
@@ -33,10 +49,31 @@
   --border: var(--sand-6);
   --primary: var(--sand-12);
   --primary-foreground: var(--sand-1);
+
+  /* Mapping variabel UI KosanKu (Dark Mode) */
+  --surface: #131316;
+  --surface-dim: #131316;
+  --surface-bright: #39393c;
+  --surface-container-lowest: #0e0e11;
+  --surface-container-low: #1b1b1e;
+  --surface-container: #1f1f22;
+  --surface-container-high: #2a2a2d;
+  --surface-container-highest: #353438;
+  --on-surface: #e4e1e6;
+  --on-surface-variant: #c7c4d7;
+  --outline: #908fa0;
+  --primary-container: #8083ff;
+  --on-primary-container: #0d0096;
 }
 
+/* --- MAP TOKEN KE TAILWIND v4 ENGINE --- */
 @theme {
   --font-sans: Ubuntu, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-headline: var(--font-jakarta), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-code: var(--font-inter), monospace;
+
+  /* Color Mappings */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,6 +82,30 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
+  /* Custom UI KosanKu Colors */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  /* Custom Spacing */
+  --spacing-gutter: 1.5rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2rem;
+  --spacing-space-2xl: 3rem;
 
   /* Radix Sand scale */
   --color-sand-1: var(--sand-1);
@@ -60,7 +121,7 @@
   --color-sand-11: var(--sand-11);
   --color-sand-12: var(--sand-12);
 
-  /* Radix Red scale (Error / Alert) */
+  /* Radix Red scale */
   --color-red-1: var(--red-1);
   --color-red-2: var(--red-2);
   --color-red-3: var(--red-3);
@@ -74,7 +135,7 @@
   --color-red-11: var(--red-11);
   --color-red-12: var(--red-12);
 
-  /* Radix Green scale (Success) */
+  /* Radix Green scale */
   --color-green-1: var(--green-1);
   --color-green-2: var(--green-2);
   --color-green-3: var(--green-3);
@@ -88,7 +149,7 @@
   --color-green-11: var(--green-11);
   --color-green-12: var(--green-12);
 
-  /* Radix Amber scale (Warning) */
+  /* Radix Amber scale */
   --color-amber-1: var(--amber-1);
   --color-amber-2: var(--amber-2);
   --color-amber-3: var(--amber-3);
@@ -102,7 +163,7 @@
   --color-amber-11: var(--amber-11);
   --color-amber-12: var(--amber-12);
 
-  /* Radix Blue scale (Info) */
+  /* Radix Blue scale */
   --color-blue-1: var(--blue-1);
   --color-blue-2: var(--blue-2);
   --color-blue-3: var(--blue-3);
@@ -115,6 +176,21 @@
   --color-blue-10: var(--blue-10);
   --color-blue-11: var(--blue-11);
   --color-blue-12: var(--blue-12);
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
 }
 
 html {

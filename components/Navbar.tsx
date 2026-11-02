@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useAuthModal } from "@/components/auth/AuthModalContext";
 
 export default function Navbar() {
@@ -10,6 +11,25 @@ export default function Navbar() {
   const [tokenExists, setTokenExists] = useState(false);
   const [dashboardHref, setDashboardHref] = useState("/dashboard");
   const { openModal } = useAuthModal();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavClick = (e: MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    // Jika berada di halaman landing page ('/'), lakukan smooth scroll manual
+    if (pathname === "/") {
+      e.preventDefault();
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.pushState(null, "", `/#${targetId}`);
+      }
+    } else {
+      // Jika di halaman lain (misal /kos/id atau /login), navigasi ke /#targetId
+      e.preventDefault();
+      router.push(`/#${targetId}`);
+    }
+    setMobileOpen(false);
+  };
 
   useEffect(() => {
     // 1. Cek token di localStorage / sessionStorage jika ada yang disimpan di client
@@ -56,19 +76,19 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <Link href="/#home" className="hover:text-foreground">
+          <Link href="/#home" onClick={(e) => handleNavClick(e, "home")} className="hover:text-foreground">
             Home
           </Link>
-          <Link href="/#about" className="hover:text-foreground">
+          <Link href="/#about" onClick={(e) => handleNavClick(e, "about")} className="hover:text-foreground">
             About
           </Link>
-          <Link href="/#product" className="hover:text-foreground">
+          <Link href="/#product" onClick={(e) => handleNavClick(e, "product")} className="hover:text-foreground">
             Products
           </Link>
-          <Link href="/#contact" className="hover:text-foreground">
+          <Link href="/#contact" onClick={(e) => handleNavClick(e, "contact")} className="hover:text-foreground">
             Contact
           </Link>
-          <Link href="/#faq" className="hover:text-foreground">
+          <Link href="/#faq" onClick={(e) => handleNavClick(e, "faq")} className="hover:text-foreground">
             FAQ
           </Link>
         </nav>
@@ -116,6 +136,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="/#home"
+                onClick={(e) => handleNavClick(e, "home")}
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 Home
@@ -124,6 +145,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="/#about"
+                onClick={(e) => handleNavClick(e, "about")}
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 About
@@ -131,7 +153,8 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                href="/#product-gallery"
+                href="/#product"
+                onClick={(e) => handleNavClick(e, "product")}
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 Products
@@ -140,6 +163,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="/#contact"
+                onClick={(e) => handleNavClick(e, "contact")}
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 Contact
@@ -148,6 +172,7 @@ export default function Navbar() {
             <li>
               <Link
                 href="/#faq"
+                onClick={(e) => handleNavClick(e, "faq")}
                 className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
               >
                 FAQ
