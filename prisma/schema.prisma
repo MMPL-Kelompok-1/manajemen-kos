@@ -109,7 +109,6 @@ model Payment {
   order                  Order             @relation(fields: [order_id], references: [id], onDelete: Restrict)
 
   @@index([order_id])
-  
 }
 
 model Review {
