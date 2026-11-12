@@ -8,9 +8,17 @@ import { formatRupiah } from "@/lib/format";
 // untuk mengambil daftar kos dari "@/lib/data".
 import { getKosList } from "@/lib/data";
 
-export default function DetailKosPage({ params }: { params: Promise<{ id: string }> }) {
+export default function DetailKosPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-7xl px-5 py-16 md:px-6">Memuat...</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-7xl px-5 py-16 md:px-6">Memuat...</div>
+      }
+    >
       <DetailProduct params={params} />
     </Suspense>
   );
@@ -36,7 +44,7 @@ async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 md:px-6 md:py-12">
       <Link
-        href="/#kos"
+        href="/#products"
         className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={16} /> Kembali ke daftar kos
@@ -60,14 +68,19 @@ async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
           <h2 className="mt-10 text-xl font-bold">Fasilitas</h2>
           <ul className="mt-4 flex flex-wrap gap-2">
             {kos.facilities.map((item) => (
-              <li key={item} className="rounded-full border border-border px-4 py-1.5 text-sm">
+              <li
+                key={item}
+                className="rounded-full border border-border px-4 py-1.5 text-sm"
+              >
                 {item}
               </li>
             ))}
           </ul>
 
           <h2 className="mt-10 text-xl font-bold">Deskripsi</h2>
-          <p className="mt-4 leading-relaxed text-muted-foreground">{kos.description}</p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            {kos.description}
+          </p>
         </div>
 
         {/* Kolom kanan: ringkasan harga dan tombol daftar */}
@@ -84,7 +97,10 @@ async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
 
           <p className="mt-6 text-3xl font-bold">
             {formatRupiah(kos.price)}
-            <span className="text-sm font-normal text-muted-foreground"> / bulan</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              {" "}
+              / bulan
+            </span>
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
             {full ? "Kamar penuh" : `Sisa ${kos.roomsLeft} kamar`}

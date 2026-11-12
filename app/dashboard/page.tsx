@@ -17,10 +17,10 @@ export default function DashboardPage(props: Props) {
 async function DashboardContent({ searchParams }: Props) {
   const { kos } = await searchParams;
   const session = await getSession();
-  if (!session) redirect("/login");
+  if (!session) redirect("/");
   if (session.role !== "client") redirect("/admin");
   const data = await getUserDashboard(session.id);
-  if (!data) redirect("/login");
+  if (!data) redirect("/");
 
   return <UserDashboard data={data} pendingKosId={kos ?? null} />;
 }

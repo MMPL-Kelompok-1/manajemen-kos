@@ -66,9 +66,8 @@ export default function Sidebar({
 
       {/* Sidebar kiri - Posisi tetap (sticky h-screen) di desktop */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 overflow-y-auto ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${isOpen ? "w-64" : "lg:w-16"}`}
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:shrink-0 overflow-y-auto ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          } ${isOpen ? "w-64" : "lg:w-16"}`}
       >
         {/* Header Sidebar */}
         <div className="flex h-14 shrink-0 items-center border-b border-border px-4">
@@ -100,11 +99,10 @@ export default function Sidebar({
                 key={item.id}
                 href={item.path}
                 onClick={() => setIsMobileOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isActive
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${isActive
                     ? "bg-muted text-foreground font-semibold"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
+                  } ${!isOpen ? "lg:justify-center lg:px-2" : ""}`}
                 title={item.label}
               >
                 <item.icon className="size-5 shrink-0" />
@@ -154,7 +152,7 @@ export default function Sidebar({
           </div>
 
           <div className="flex items-center gap-3">
-            <LogoutButton redirectTo="/login" />
+            <LogoutButton key={pathname} redirectTo="/" />
           </div>
         </header>
 
