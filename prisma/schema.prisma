@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum RoleEnum {
@@ -72,8 +71,8 @@ model Room {
   orders      Order[]
   reviews     Review[]
 
-  @@index([client_id, created_at])
-  @@index([room_id])
+  @@index([status])
+  @@index([room_number])
 }
 
 model Order {

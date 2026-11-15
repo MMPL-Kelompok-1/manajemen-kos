@@ -9,10 +9,15 @@ export default function LogoutButton({ redirectTo = "/" }: { redirectTo?: string
   const [loading, setLoading] = useState(false);
 
   async function logout() {
-    setLoading(true);
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.replace(redirectTo);
-    router.refresh();
+    try {
+      setLoading(true);
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.replace(redirectTo);
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLoading(false);
+    }
   }
 
   return (
