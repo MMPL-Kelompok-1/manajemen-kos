@@ -1,26 +1,19 @@
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import UserDashboard from "@/components/dashboard/UserDashboard";
-import { getSession } from "@/lib/auth";
-import { getUserDashboard } from "@/lib/data";
+import KosAnda from "@/components/dashboard/KosAnda";
+import { requireUserDashboard } from "@/lib/user-dashboard";
 
 type Props = { searchParams: Promise<{ kos?: string }> };
 
 export default function DashboardPage(props: Props) {
   return (
-    <Suspense fallback={<div className="min-h-[100svh] bg-background" />}>
-      <DashboardContent {...props} />
+    <Suspense fallback={<p className="text-sm text-muted-foreground">Memuat...</p>}>
+      <Content {...props} />
     </Suspense>
   );
 }
 
-async function DashboardContent({ searchParams }: Props) {
+async function Content({ searchParams }: Props) {
   const { kos } = await searchParams;
-  const session = await getSession();
-  if (!session) redirect("/login");
-  if (session.role !== "client") redirect("/admin");
-  const data = await getUserDashboard(session.id);
-  if (!data) redirect("/login");
-
-  return <UserDashboard data={data} pendingKosId={kos ?? null} />;
+  const data = await requireUserDashboard();
+  return <KosAnda data={data} pendingKosId={kos ?? null} />;
 }
