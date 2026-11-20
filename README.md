@@ -1,114 +1,78 @@
-# KosanKu — Situs Pencarian, Pembayaran & Dashboard Kos
+# KosanKu
 
-Frontend dan backend dalam satu proyek Next.js 16 (App Router).
+Aplikasi pencarian, pendaftaran, dan pembayaran kos. Frontend dan backend dalam satu proyek Next.js 16 (App Router), data di PostgreSQL lewat Prisma 7.
 
 ## Menjalankan
 
 ```bash
 npm install
-cp .env.example .env.local    # isi SESSION_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
+cp .env.example .env          # isi DATABASE_URL, SESSION_SECRET, OWNER_PASSWORD, BANK_*
+npx prisma migrate deploy     # terapkan skema
+npm run db:seed               # buat akun pemilik dan kamar contoh
 npm run dev                   # http://localhost:3000
-npm run build && npm start    # mode produksi
 ```
 
-Di development, jika `ADMIN_EMAIL` / `ADMIN_PASSWORD` kosong, admin memakai
-`admin@KosanKu.local` / `admin12345`. Di production variabel ini wajib diisi,
-dan `SESSION_SECRET` wajib diisi (tanpanya login akan gagal dengan error).
+Mode produksi: `npm run build && npm start`. Di produksi `SESSION_SECRET` dan ketiga variabel `BANK_*` wajib diisi; tanpa itu login dan halaman pembayaran akan gagal dengan pesan yang jelas.
 
-## Halaman
+## Peran dan halaman
 
-| Halaman | Untuk | Keterangan |
+| Halaman | Untuk | Isi |
 | --- | --- | --- |
-| `/` | Umum | Landing page, daftar kos, spesifikasi, dan foto |
-| `/login` | Admin, penghuni / calon penghuni | Masuk atau daftar; admin diarahkan otomatis ke dashboard admin |
-| `/dashboard` | Penghuni | Kos, nomor kamar, status, tanggal bayar, jatuh tempo, rekening, "Saya sudah membayar", perpanjangan |
-| `/admin/login` | - | URL lama yang diarahkan ke halaman login bersama |
-| `/admin` | Admin | Ringkasan, daftar penghuni, nomor kamar, konfirmasi pembayaran lunas |
+| `/` | Umum | Daftar kos, harga, fasilitas |
+| `/kos/[id]` | Umum | Detail kamar dan tombol daftar |
+| `/login` | Semua | Masuk atau daftar; pemilik diarahkan ke dashboard admin |
+| `/dashboard` | Penghuni | Kamar, status tagihan, jatuh tempo |
+| `/dashboard/pembayaran` | Penghuni | Rekening tujuan, "Saya sudah membayar", perpanjangan |
+| `/dashboard/histori` | Penghuni | Riwayat pesanan dan tagihan |
+| `/admin/dashboard` | Pemilik | Pesanan masuk, daftar penghuni, konfirmasi pembayaran |
+| `/admin/penghuni` | Pemilik | Daftar penghuni, filter status, konfirmasi cepat |
+| `/admin/penghuni/[id]` | Pemilik | Detail penghuni, ubah nomor kamar, riwayat pesanan dan tagihan |
+| `/admin/transaksi` | Pemilik | Semua tagihan, filter status/bulan, konfirmasi transfer |
+| `/admin/laporan` | Pemilik | Pendapatan per bulan dan per kamar, piutang, unduh CSV (`?tahun=YYYY`) |
+| `/admin/manajemenkos` | Pemilik | Kamar, okupansi, tambah kamar |
 
-Alur penghuni: pilih kos di landing page → "Pilih & daftar" → daftar atau masuk →
-tagihan dibuat otomatis → transfer ke rekening → "Saya sudah membayar" →
-admin mengonfirmasi di `/admin` → status menjadi lunas dan kamar berkurang.
-
-## Status pembayaran
-
-- **Belum bayar**: tagihan dibuat, belum ditandai sudah dibayar.
-- **Menunggu konfirmasi**: penghuni sudah menekan "Saya sudah membayar".
-- **Lunas**: admin sudah mengonfirmasi. Tanggal bayar dicatat.
-- **Terlambat**: lebih dari satu bulan sejak tanggal bayar terakhir tanpa tagihan baru.
-- **Belum pilih kos**: akun sudah terdaftar tetapi belum memilih kos.
-
-Aturan bisnis:
-- Satu penghuni hanya boleh punya satu tagihan yang belum lunas.
-- Perpanjangan hanya untuk kos yang sudah ditempati.
-- `roomsLeft` berkurang hanya saat penghuni baru pertama kali dikonfirmasi lunas.
+Alur: pilih kamar, daftar atau masuk, tagihan dibuat otomatis (berlaku 24 jam), transfer, tekan "Saya sudah membayar", pemilik mengonfirmasi, status menjadi lunas dan kamar terisi.
 
 ## API
 
 ```
-POST /api/auth/register              { name, phone, email, password }   (penghuni)
-POST /api/auth/login                 { email, password }                 (admin atau penghuni)
-POST /api/auth/logout
-POST /api/payments                   { kosId }                          (penghuni)
-POST /api/payments/:id/paid                                             (penghuni, tagihan sendiri)
-POST /api/admin/payments/:id/confirm                                    (admin)
-PATCH /api/admin/registrations/:id   { roomNumber }                     (admin)
+POST  /api/auth/register                 { name, phone, email, password }   batas 10/jam per IP
+POST  /api/auth/login                    { email, password }                 batas 5 gagal/15 menit
+POST  /api/auth/logout
+GET   /api/auth/me
+POST  /api/payments                      { kosId }                           penghuni
+POST  /api/payments/:id/paid                                                 penghuni, tagihan sendiri
+POST  /api/admin/payments/:id/confirm                                        pemilik
+PATCH /api/admin/registrations/:id       { roomNumber }                      pemilik
+POST  /api/admin/rooms                   { roomNumber, name, area, price, ... } pemilik
+GET   /api/admin/laporan/export?tahun=YYYY                                    pemilik, CSV
 ```
 
 ## Struktur
 
 ```
-app/
-  layout.tsx                        Layout root (tanpa header/footer)
-  (public)/layout.tsx               Header & footer untuk halaman publik
-  (public)/page.tsx                 Landing page
-  (public)/login/page.tsx           Login & daftar penghuni
-  dashboard/page.tsx                Dashboard penghuni (wajib masuk)
-  admin/login/page.tsx              Redirect ke login bersama
-  admin/page.tsx                    Dashboard admin (wajib masuk admin)
-  api/...                           Route handler (lihat daftar API)
+app/                    route (halaman dan app/api)
 components/
-  SiteHeader, Footer, Hero, WhyChooseUs, KosSection, KosExplorer
-  StatusBadge.tsx                   Badge status pembayaran
-  auth/AuthForms.tsx, auth/LogoutButton.tsx
-  dashboard/UserDashboard.tsx       Tampilan penghuni
-  admin/AdminDashboard.tsx          Tabel (desktop) & kartu (HP) penghuni
+  ui/                   komponen dasar: EmptyState, StatCard, Section, CopyButton, Segmented, status
+  layout/AppShell.tsx   shell admin dan penghuni
+  admin/, dashboard/, auth/   tampilan per area
 lib/
-  data.ts                           Logika data & aturan bisnis (backend)
-  auth.ts                           Pemeriksaan sesi untuk halaman & API
-  session.ts                        Token sesi bertanda HMAC
-  password.ts                       Hash kata sandi (scrypt)
-  payment.ts                        Rekening tujuan & tipe status
-  format.ts                         Format Rupiah, tanggal, dan jatuh tempo
-  http.ts                           Helper response error
-data/
-  kos.json                          Data kos (edit di sini)
-  registrations.json                Dibuat otomatis (akun penghuni, jangan di-commit)
-  payments.json                     Dibuat otomatis (jangan di-commit)
-public/images/                      Foto kos dan hero
+  services/             logika bisnis per domain: auth, payment, room, dashboard, tenant, transaction, report
+  status.ts             satu sumber turunan status tagihan dan penghuni
+  validation.ts, errors.ts, mappers.ts, types.ts
+  data.ts               re-export untuk kompatibilitas
+  auth.ts, session.ts   sesi cookie bertanda HMAC
+  rate-limit.ts         pembatas percobaan (per proses)
+  payment.ts            rekening tujuan dari env
+  client/http.ts        helper fetch untuk komponen client
+prisma/
+  schema.prisma, migrations/, seed.ts, seed-data/kos.json
 ```
 
-## Menambahkan foto
-
-Letakkan file di `public/images/` sesuai daftar di `data/kos.json` (kolom `photos`).
-Foto yang belum ada tampil sebagai placeholder abu-abu.
-
-## Yang perlu diganti sebelum production
-
-- **Data kos**: ganti isi `data/kos.json` dengan data asli.
-- **Rekening**: ganti `BANK_INFO` di `lib/payment.ts`.
-- **Kredensial & sesi**: isi `SESSION_SECRET`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD` di environment.
-- **Pembayaran otomatis**: saat ini transfer manual lalu dikonfirmasi admin. Untuk konfirmasi otomatis,
-  integrasikan payment gateway (Midtrans, Xendit, atau QRIS) di `app/api/payments/route.ts`.
-- **Database**: data disimpan sebagai file JSON. Tidak cocok untuk hosting serverless (Vercel)
-  karena file tidak persisten. Ganti `readCollection` / `writeCollection` di `lib/data.ts`
-  dengan PostgreSQL atau SQLite.
-- **Pembatasan login**: belum ada rate limiting untuk percobaan masuk. Tambahkan sebelum dipakai publik.
-- **Akun lama**: akun di `registrations.json` yang dibuat sebelum fitur kata sandi tidak bisa masuk. Daftar ulang.
-- **Kontak**: email dan telepon di `components/Footer.tsx`.
-- **Font**: memakai Ubuntu jika terpasang, lalu fallback sistem. Untuk memuat Ubuntu otomatis,
-  gunakan `next/font/google` di `app/layout.tsx`.
+Desain memakai token di `app/globals.css` (skala `ink-1..12`, permukaan, bayangan, resep `.btn`, `.field`, `.badge`, `.table-tactile`). Gunakan resep itu, jangan warna atau ukuran lepas.
 
 ## Catatan
 
-- Halaman yang membaca sesi memakai `<Suspense>` karena `cacheComponents` aktif di `next.config.ts`.
-- Teks hero dan bagian keunggulan masih memakai bahasa Inggris sesuai desain.
+- Pembatas login disimpan di memori proses. Untuk lebih dari satu instance, ganti dengan penyimpanan bersama (misalnya Redis).
+- Foto kamar dari seed (`/images/kamar-*.jpg`) belum ada di `public/images/`; kamar tanpa foto menampilkan placeholder.
+- Kontak di `components/Footer.tsx` masih contoh; ganti dengan kontak asli.

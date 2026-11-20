@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 
-// GET /api/auth/me
-// Mengecek apakah user memiliki sesi/token aktif dan mengembalikan data sesi.
 export async function GET() {
   try {
     const session = await getSession();

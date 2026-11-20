@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { createPayment } from "@/lib/data";
+import { createPayment } from "@/lib/services/payment";
 import { requireRole } from "@/lib/auth";
 import { errorResponse, readJson } from "@/lib/http";
-import { BANK_INFO, type PaymentResult } from "@/lib/payment";
+import { getBankInfo, type PaymentResult } from "@/lib/payment";
 
 // POST /api/payments  body: { kosId }   (wajib masuk sebagai penghuni)
 export async function POST(request: Request) {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         status: payment.status,
         kosName,
       },
-      bank: BANK_INFO,
+      bank: getBankInfo(),
     };
     return NextResponse.json(result, { status: 201 });
   } catch (error) {

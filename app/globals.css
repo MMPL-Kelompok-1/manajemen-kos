@@ -10,68 +10,184 @@
 @import "@radix-ui/colors/blue.css";
 @import "@radix-ui/colors/blue-dark.css";
 
-/* --- TEMA GLOBAL AWAL ANDA --- */
+/* Varian dark: mengikuti kelas dari tombol tema, bukan prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *, .dark-theme, .dark-theme *));
+
+/* Token tactile. Neutral = Radix sand; komponen memakai peran (ink-N, surface, shadow), bukan hex. */
 :root,
 .light,
 .light-theme {
-  --background: var(--sand-1);
-  --foreground: var(--sand-12);
-  --card: var(--sand-2);
-  --muted: var(--sand-3);
-  --muted-foreground: var(--sand-11);
-  --border: var(--sand-6);
-  --primary: var(--sand-12);
-  --primary-foreground: var(--sand-1);
+  --ink-1: var(--sand-1);  --ink-2: var(--sand-2);  --ink-3: var(--sand-3);
+  --ink-4: var(--sand-4);  --ink-5: var(--sand-5);  --ink-6: var(--sand-6);
+  --ink-7: var(--sand-7);  --ink-8: var(--sand-8);  --ink-9: var(--sand-9);
+  --ink-10: var(--sand-10); --ink-11: var(--sand-11); --ink-12: var(--sand-12);
+  --ink-a3: #20100010; --ink-a4: #1f150019;
 
-  /* Mapping variabel UI KosanKu (Light Mode) */
-  --surface: #ffffff;
-  --surface-dim: #f3f3f5;
-  --surface-bright: #ffffff;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #f8f9fa;
-  --surface-container: #f1f3f5;
-  --surface-container-high: #e9ecef;
-  --surface-container-highest: #e0e0e0;
-  --on-surface: #121212;
-  --on-surface-variant: #555555;
-  --outline: #888888;
-  --primary-container: #e2e8f0;
-  --on-primary-container: #0f172a;
+  --surface-top: #ffffff;
+  --ground: var(--sand-2);
+  --panel: var(--surface-top);
+  --raised: var(--surface-top);
+  --overlay: var(--surface-top);
+  --well: var(--sand-3);
+  --well-focus: var(--sand-4);
+  --line: var(--sand-6);
+  --hairline: 0.5px;
+  --focus-ring: var(--sand-10);
+
+  --primary-bg: var(--sand-12);
+  --primary-fg: var(--sand-1);
+  --primary-hover: color-mix(in oklab, var(--primary-bg) 93%, var(--primary-fg));
+
+  --shadow-ink: 33 32 28;
+  --shadow-button: 0 1px 2px 0 rgb(var(--shadow-ink) / .12), 0 0 0 1px rgb(var(--shadow-ink) / .08);
+  --shadow-primary: 0 0 0 1px var(--surface-top);
+  --shadow-toggle: var(--shadow-button);
+  --shadow-card: 0 0 0 1px rgb(var(--shadow-ink) / .07), 0 1px 2px 0 rgb(var(--shadow-ink) / .12),
+                 0 3px 4px -2px rgb(var(--shadow-ink) / .08);
+  --shadow-table: 0 1px 2px 0 rgb(var(--shadow-ink) / .12);
+  --shadow-panel: 0 0 0 0.5px var(--ink-a4), 0 1px 2px 0 rgb(var(--shadow-ink) / .015),
+                  0 3px 4px -2px rgb(var(--shadow-ink) / .025);
+  --shadow-menu: 0 0 0 1px rgb(var(--shadow-ink) / .08), 0 1px 2px 0 rgb(var(--shadow-ink) / .12),
+                 0 4px 8px -4px rgb(var(--shadow-ink) / .16);
+  --shadow-modal: 0 0 0 1px rgb(var(--shadow-ink) / .07), 0 1px 2px 0 rgb(var(--shadow-ink) / .14),
+                  0 6px 8px -4px rgb(var(--shadow-ink) / .14);
+  --shadow-badge: 0 1px 2px 0 color-mix(in srgb, currentColor 16%, transparent),
+                  0 0 0 1px color-mix(in srgb, currentColor 14%, transparent);
+  --backdrop: rgb(0 0 0 / .3);
+
+  --radius-control: 6px;
+  --radius-xs: calc(var(--radius-control) / 2);
+  --radius-sm-token: calc(var(--radius-control) - 2px);
+  --radius-container: calc(var(--radius-control) + 2px);
+  --radius-feature: calc(var(--radius-container) * 1.5);
+  --radius-sheet: 14px;
+
+  --control-h: 36px; --control-h-compact: 32px; --control-h-pill: 28px;
+  --control-h-inline: 24px; --control-h-icon: 22px; --badge-h: 20px;
+  --row-h: 38px;
+
+  --font-weight-ui: 500;
+  --text-meta: 12px;    --leading-meta: 16px;
+  --text-body: 13px;    --leading-body: 20px;
+  --text-title: 16px;   --leading-title: 24px;
+  --text-section: 20px; --leading-section: 28px;
+  --text-figure: 24px;  --leading-figure: 32px;
+  --text-display: 32px; --leading-display: 40px;
+  --text-field: var(--text-body);
+
+  --dur-hover: 150ms; --dur-swap: 200ms; --dur-modal: 240ms; --dur-move: 300ms;
+
+  /* Alias nama lama (shadcn, material) ke peran tactile. */
+  --background: var(--panel);
+  --foreground: var(--ink-12);
+  --card: var(--raised);
+  --muted: var(--ink-3);
+  --muted-foreground: var(--ink-11);
+  --border: var(--line);
+  --primary: var(--primary-bg);
+  --primary-foreground: var(--primary-fg);
+
+  --surface: var(--panel);
+  --surface-dim: var(--ink-2);
+  --surface-bright: var(--surface-top);
+  --surface-container-lowest: var(--surface-top);
+  --surface-container-low: var(--ink-2);
+  --surface-container: var(--ink-3);
+  --surface-container-high: var(--ink-4);
+  --surface-container-highest: var(--ink-5);
+  --on-surface: var(--ink-12);
+  --on-surface-variant: var(--ink-11);
+  --outline: var(--ink-9);
+  --primary-container: var(--ink-3);
+  --on-primary-container: var(--ink-12);
 }
 
+/* Dark: hanya warna dan bayangan. Ukuran, padding, radius tidak berubah. */
 .dark,
 .dark-theme {
-  --background: var(--sand-1);
-  --foreground: var(--sand-12);
-  --card: var(--sand-2);
-  --muted: var(--sand-3);
-  --muted-foreground: var(--sand-11);
-  --border: var(--sand-6);
-  --primary: var(--sand-12);
-  --primary-foreground: var(--sand-1);
+  --ink-a3: #f6f6f513; --ink-a4: #fefef31b;
+  --surface-top: var(--sand-1);
+  --ground: #080807;
+  --panel: var(--sand-1);
+  --raised: var(--sand-2);
+  --overlay: var(--sand-2);
+  --well: var(--sand-3);
+  --well-focus: var(--sand-4);
+  --line: var(--sand-5);
 
-  /* Mapping variabel UI KosanKu (Dark Mode) */
-  --surface: #131316;
-  --surface-dim: #131316;
-  --surface-bright: #39393c;
-  --surface-container-lowest: #0e0e11;
-  --surface-container-low: #1b1b1e;
-  --surface-container: #1f1f22;
-  --surface-container-high: #2a2a2d;
-  --surface-container-highest: #353438;
-  --on-surface: #e4e1e6;
-  --on-surface-variant: #c7c4d7;
-  --outline: #908fa0;
-  --primary-container: #8083ff;
-  --on-primary-container: #0d0096;
+  --shadow-button: 0 0 0 0.5px var(--sand-6), 0 1px 2px 0 rgb(0 0 0 / .5);
+  --shadow-primary: 0 0 0 0.5px var(--primary-bg), 0 1px 2px 0 rgb(0 0 0 / .5);
+  --shadow-toggle: var(--shadow-button);
+  --shadow-card: 0 0 0 0.5px var(--sand-6), 0 1px 2px 0 rgb(0 0 0 / .5), 0 3px 4px -2px rgb(0 0 0 / .4);
+  --shadow-table: 0 1px 2px 0 rgb(0 0 0 / .5);
+  --shadow-panel: 0 0 0 0.5px var(--ink-a3), 0 1px 2px 0 rgb(0 0 0 / .5), 0 3px 4px -2px rgb(0 0 0 / .4);
+  --shadow-menu: 0 0 0 0.5px var(--sand-7), 0 1px 2px 0 rgb(0 0 0 / .5), 0 4px 8px -4px rgb(0 0 0 / .5);
+  --shadow-modal: 0 0 0 0.5px var(--sand-7), 0 1px 2px 0 rgb(0 0 0 / .5), 0 6px 8px -4px rgb(0 0 0 / .5);
+  --shadow-badge: 0 0 0 0.5px color-mix(in srgb, currentColor 34%, #000), 0 1px 2px 0 rgb(0 0 0 / .5);
+  --backdrop: rgb(0 0 0 / .9);
 }
 
-/* --- MAP TOKEN KE TAILWIND v4 ENGINE --- */
+/* Di dark, kontrol di atas kartu/overlay naik satu langkah dan outline-nya ikut. */
+.dark :is(.surface-raised, .surface-overlay),
+.dark-theme :is(.surface-raised, .surface-overlay) {
+  --shadow-button: 0 0 0 0.5px var(--sand-7), 0 1px 2px 0 rgb(0 0 0 / .5);
+  --shadow-toggle: var(--shadow-button);
+  --control-fill: var(--sand-4);
+}
+
+/* Ponsel & layar sentuh: hanya nilai. */
+@media screen and (width < 48rem) {
+  :root { --control-h: 44px; --row-h: 44px; --text-body: 15px; --leading-body: 24px; }
+}
+@media (pointer: coarse) {
+  :root { --text-field: 16px; }
+}
+
+/* Token ke utilitas Tailwind v4 */
+@theme inline {
+  --color-ink-1: var(--ink-1);   --color-ink-2: var(--ink-2);   --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);   --color-ink-5: var(--ink-5);   --color-ink-6: var(--ink-6);
+  --color-ink-7: var(--ink-7);   --color-ink-8: var(--ink-8);   --color-ink-9: var(--ink-9);
+  --color-ink-10: var(--ink-10); --color-ink-11: var(--ink-11); --color-ink-12: var(--ink-12);
+  --color-line: var(--line);
+  --color-focus-ring: var(--focus-ring);
+  --color-ground: var(--ground);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-overlay: var(--overlay);
+  --color-well: var(--well);
+
+  --radius-control: var(--radius-control);
+  --radius-container: var(--radius-container);
+  --radius-feature: var(--radius-feature);
+
+  /* Skala tipe: basis 13px */
+  --text-xs: var(--text-meta);     --text-xs--line-height: var(--leading-meta);
+  --text-sm: var(--text-body);     --text-sm--line-height: var(--leading-body);
+  --text-base: var(--text-title);  --text-base--line-height: var(--leading-title);
+  --text-lg: var(--text-title);    --text-lg--line-height: var(--leading-title);
+  --text-xl: var(--text-section);  --text-xl--line-height: var(--leading-section);
+  --text-2xl: var(--text-figure);  --text-2xl--line-height: var(--leading-figure);
+  --text-3xl: var(--text-display); --text-3xl--line-height: var(--leading-display);
+
+  /* Satu bobot untuk UI */
+  --font-weight-normal: var(--font-weight-ui);
+  --font-weight-medium: var(--font-weight-ui);
+  --font-weight-semibold: var(--font-weight-ui);
+}
+
 @theme {
-  --font-sans: Ubuntu, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-headline: var(--font-jakarta), sans-serif;
-  --font-body: var(--font-inter), sans-serif;
-  --font-code: var(--font-inter), monospace;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-headline: var(--font-jakarta), var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-code: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Kurva gerak: didefinisikan sekali */
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-move: cubic-bezier(.22, 1, .36, 1);
+  --ease-drawer: cubic-bezier(.32, .72, 0, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
 
   /* Color Mappings */
   --color-background: var(--background);
@@ -178,22 +294,276 @@
   --color-blue-12: var(--blue-12);
 }
 
-.material-symbols-outlined {
-  font-family: "Material Symbols Outlined", sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-}
-
 html {
   color-scheme: light dark;
   scroll-behavior: smooth;
+  font-size-adjust: 0.546;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-ui);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Fokus keyboard: satu token untuk semua kontrol */
+:where(a, button, [role="button"], [role="tab"], [role="switch"], summary, input, select, textarea):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Kursor: ditetapkan sekali. Utilitas Tailwind tetap bisa menimpa. */
+@layer base {
+  :where(
+    a[href],
+    button:not(:disabled),
+    summary,
+    select:not(:disabled),
+    label[for],
+    [role="button"],
+    [role="tab"],
+    [role="switch"],
+    input[type="checkbox"]:not(:disabled),
+    input[type="radio"]:not(:disabled)
+  ) {
+    cursor: pointer;
+  }
+  :where(button, select, input, textarea, [role="button"]):disabled,
+  :where([aria-disabled="true"]) {
+    cursor: not-allowed;
+  }
+}
+
+/* Resep komponen */
+@layer components {
+  /* Permukaan */
+  .surface-ground { background: var(--ground); }
+  .surface-panel { background: var(--panel); box-shadow: var(--shadow-panel); border-radius: var(--radius-container); }
+  .surface-raised, .card-raised {
+    background: var(--raised);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-container);
+  }
+  .surface-overlay {
+    background: var(--overlay);
+    box-shadow: var(--shadow-modal);
+    border-radius: var(--radius-container);
+  }
+  .surface-menu {
+    background: var(--overlay);
+    box-shadow: var(--shadow-menu);
+    border-radius: var(--radius-container);
+  }
+
+  /* Tombol */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--control-h);
+    padding-inline: 14px;
+    border-radius: var(--radius-control);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    font-weight: var(--font-weight-ui);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    user-select: none;
+    transition-property: background-color, color, box-shadow, transform, opacity;
+    transition-duration: var(--dur-hover);
+    transition-timing-function: var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn:disabled, .btn[aria-disabled="true"] { opacity: .6; cursor: not-allowed; }
+  .btn-sm { height: var(--control-h-compact); padding-inline: 12px; }
+  .btn-pill { height: var(--control-h-pill); padding-inline: 12px; border-radius: 999px; }
+  .btn-icon { width: var(--control-h); padding-inline: 0; }
+  .btn-icon.btn-sm { width: var(--control-h-compact); }
+
+  .btn-primary {
+    background: var(--primary-bg);
+    color: var(--primary-fg);
+    box-shadow: var(--shadow-primary);
+  }
+  .btn-secondary, .btn-pill {
+    background: var(--control-fill, var(--surface-top));
+    color: var(--ink-12);
+    box-shadow: var(--shadow-button);
+  }
+  .dark .btn-secondary, .dark .btn-pill { background: var(--control-fill, var(--sand-3)); }
+  .btn-ghost { background: transparent; color: var(--ink-11); }
+  .btn-danger {
+    background: var(--control-fill, var(--surface-top));
+    color: var(--red-11);
+    box-shadow: var(--shadow-button);
+  }
+  .dark .btn-danger { background: var(--control-fill, var(--sand-3)); }
+  .btn-danger-solid { background: var(--red-9); color: #fff; box-shadow: var(--shadow-button); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-secondary:hover:not(:disabled), .btn-pill:hover:not(:disabled), .btn-danger:hover:not(:disabled) {
+      background: color-mix(in oklab, var(--control-fill, var(--surface-top)) 96%, var(--ink-12));
+    }
+    .btn-ghost:hover:not(:disabled) { background: var(--ink-3); color: var(--ink-12); }
+    .btn-danger-solid:hover:not(:disabled) { background: var(--red-10); }
+  }
+  .dark .btn-primary:disabled { opacity: 1; background: var(--sand-4); color: var(--sand-8); }
+
+  /* Field = sumur */
+  .field {
+    width: 100%;
+    height: var(--control-h);
+    padding-inline: 12px;
+    border-radius: var(--radius-control);
+    background: var(--well);
+    color: var(--ink-12);
+    font-size: var(--text-field);
+    line-height: var(--leading-body);
+    border: 0;
+    outline: none;
+    transition: background-color var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out);
+  }
+  textarea.field { height: auto; padding-block: 8px; }
+  .field::placeholder { color: var(--ink-10); }
+  .field:focus { background: var(--well-focus); }
+  .field:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--focus-ring); }
+  .field[aria-invalid="true"] { box-shadow: 0 0 0 1px var(--red-11); }
+  .field:disabled { opacity: .6; }
+  .field-label { display: block; margin-bottom: 6px; font-size: var(--text-body); line-height: var(--leading-body); color: var(--ink-12); }
+  .field-hint { margin-top: 6px; font-size: var(--text-meta); line-height: var(--leading-meta); color: var(--ink-11); }
+  .field-error { margin-top: 6px; font-size: var(--text-meta); line-height: var(--leading-meta); color: var(--red-11); }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: var(--badge-h);
+    padding-inline: 8px;
+    border-radius: 999px;
+    font-size: var(--text-meta);
+    line-height: var(--badge-h);
+    white-space: nowrap;
+    box-shadow: var(--shadow-badge);
+  }
+  .badge-neutral { background: var(--control-fill, var(--surface-top)); color: var(--ink-11); box-shadow: var(--shadow-button); }
+  .dark .badge-neutral { background: var(--control-fill, var(--sand-3)); }
+  .badge-green { background: var(--green-3); color: var(--green-11); }
+  .badge-red { background: var(--red-3); color: var(--red-11); }
+  .badge-amber { background: var(--amber-3); color: var(--amber-11); }
+  .badge-blue { background: var(--blue-3); color: var(--blue-11); }
+
+  /* Tabel */
+  .table-tactile {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--raised);
+    border-radius: var(--radius-container);
+    box-shadow: var(--shadow-table), 0 0 0 var(--hairline) var(--line);
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+  }
+  .table-tactile th, .table-tactile td {
+    height: var(--row-h);
+    padding: 9px 14px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: var(--hairline) solid var(--line);
+  }
+  .table-tactile tbody tr:last-child td { border-bottom: 0; }
+  .table-tactile th { color: var(--ink-11); font-size: var(--text-body); background: var(--raised); }
+  .table-tactile td { color: var(--ink-11); }
+  .table-tactile td:first-child { color: var(--ink-12); }
+  @media (hover: hover) and (pointer: fine) {
+    .table-tactile tbody tr { transition: background-color var(--dur-hover) var(--ease-out); }
+    .table-tactile tbody tr:hover { background: var(--ink-2); }
+  }
+
+  /* Tipe */
+  .text-display { font-size: var(--text-display); line-height: var(--leading-display); letter-spacing: -0.02em; color: var(--ink-12); }
+  .text-section { font-size: var(--text-section); line-height: var(--leading-section); color: var(--ink-12); }
+  .text-title { font-size: var(--text-title); line-height: var(--leading-title); color: var(--ink-12); }
+  .text-figure { font-size: var(--text-figure); line-height: var(--leading-figure); color: var(--ink-12); font-variant-numeric: tabular-nums; }
+  .text-meta { font-size: var(--text-meta); line-height: var(--leading-meta); color: var(--ink-10); }
+  /* Blok sisipan di dalam kartu: satu langkah dari permukaan kartu */
+  .inset-fill { background: var(--ink-2); }
+  .dark .inset-fill, .dark-theme .inset-fill { background: var(--ink-3); }
+  .hairline-b { border-bottom: var(--hairline) solid var(--line); }
+  .hairline-t { border-top: var(--hairline) solid var(--line); }
+  .hairline-r { border-right: var(--hairline) solid var(--line); }
+
+  /* Segmented: lintasan berupa sumur, opsi terpilih naik satu langkah */
+  .segmented {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: var(--radius-container);
+    background: var(--well);
+  }
+  .segmented > button {
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--control-h-pill);
+    padding-inline: 10px;
+    border-radius: var(--radius-sm-token);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    color: var(--ink-11);
+    transition: background-color var(--dur-hover) var(--ease-out), color var(--dur-hover) var(--ease-out),
+      box-shadow var(--dur-hover) var(--ease-out);
+  }
+  .segmented > button[aria-pressed="true"] {
+    background: var(--control-fill, var(--surface-top));
+    color: var(--ink-12);
+    box-shadow: var(--shadow-toggle);
+  }
+  .dark .segmented > button[aria-pressed="true"] { background: var(--control-fill, var(--sand-4)); }
+  @media (hover: hover) and (pointer: fine) {
+    .segmented > button:hover:not([aria-pressed="true"]) { color: var(--ink-12); }
+  }
+  @media screen and (width < 48rem) {
+    .segmented > button { height: 34px; }
+  }
+
+  /* Kerangka muat: blok sumur yang berdenyut pelan */
+  .skeleton {
+    display: block;
+    border-radius: var(--radius-sm-token);
+    background: var(--ink-3);
+    animation: tactile-pulse 1.6s var(--ease-in-out) infinite;
+  }
+
+  /* Tekan pada kartu yang bisa diklik */
+  .press-card { transition: transform var(--dur-hover) var(--ease-out), box-shadow var(--dur-hover) var(--ease-out); }
+  .press-card:active { transform: scale(.99); }
+}
+
+/* Gerak: masuk overlay */
+@keyframes tactile-modal-in {
+  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes tactile-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tactile-pulse { 50% { opacity: .55; } }
+.animate-modal-in { animation: tactile-modal-in var(--dur-modal) var(--ease-out) both; }
+.animate-fade-in { animation: tactile-fade-in var(--dur-swap) var(--ease-out) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-modal-in { animation: tactile-fade-in 180ms var(--ease-out) both; }
+  .btn:active:not(:disabled), .press-card:active { transform: none; }
+  .skeleton { animation: none; }
+  html { scroll-behavior: auto; }
 }

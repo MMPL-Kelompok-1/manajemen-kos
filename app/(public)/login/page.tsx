@@ -18,15 +18,12 @@ async function LoginContent({ searchParams }: Props) {
   const session = await getSession();
 
   // Sudah masuk: langsung ke dashboard yang sesuai.
-  if (session?.role === "owner") redirect("/admin");
+  if (session?.role === "owner") redirect("/admin/dashboard");
   if (session?.role === "client") {
     redirect(kos ? `/dashboard?kos=${encodeURIComponent(kos)}` : "/dashboard");
   }
 
-  return (
-    <AuthForms
-      initialTab={tab === "daftar" ? "daftar" : "masuk"}
-      kosId={kos ?? null}
-    />
-  );
+  const initialTab = tab === "daftar" ? "daftar" : "masuk";
+  // key: ganti ?tab= di URL memasang ulang form dengan tab yang benar.
+  return <AuthForms key={`${initialTab}:${kos ?? ""}`} initialTab={initialTab} kosId={kos ?? null} />;
 }

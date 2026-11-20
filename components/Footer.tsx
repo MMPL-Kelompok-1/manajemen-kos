@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUp, Mail, MapPin, Phone, Search } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalContext";
 
 // Ubah kontak di sini.
@@ -10,115 +10,87 @@ const TELEPON = "+62 1234 5678 9012";
 
 // Sama dengan menu di Navbar supaya tujuannya seragam.
 const menu = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Products", href: "/#product" },
-  { label: "Contact", href: "/#contact" },
-  { label: "FAQ", href: "/#faq" },
+  { label: "Beranda", href: "/#home" },
+  { label: "Tentang", href: "/#about" },
+  { label: "Daftar kos", href: "/#product" },
+  { label: "Kontak", href: "/#contact" },
 ];
 
-const cardClass =
-  "rounded-3xl border border-primary-foreground/20 bg-primary-foreground/[.04] p-6 sm:p-8";
-const labelClass = "text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground";
-const ikonClass =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary-foreground/30 transition-colors";
+const labelClass = "text-sm text-ink-12";
 const linkClass =
-  "group inline-flex items-center gap-2 py-1.5 text-left text-primary-foreground/70 transition-colors hover:text-primary-foreground";
-const garisClass =
-  "h-px w-3 bg-primary-foreground/40 transition-all group-hover:w-5 group-hover:bg-primary-foreground";
+  "inline-flex min-h-8 items-center text-left text-sm text-ink-11 transition-colors duration-150 hover:text-ink-12 max-md:min-h-11 max-md:text-[15px]";
+const kontakClass = "flex items-center gap-3 text-sm text-ink-11 max-md:text-[15px]";
 
 export default function Footer() {
   const { openModal } = useAuthModal();
 
   return (
-    <footer id="contact" className="border-t border-primary-foreground/20 bg-primary text-primary-foreground scroll-mt-20">
-      <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-6 md:pt-16">
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-          {/* Card KosanKu */}
-          <div className={`${cardClass} sm:col-span-2 md:col-span-1`}>
-            <Link href="/" className="inline-flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-background text-foreground">
-                <Search size={20} />
-              </span>
-              <span className="text-2xl font-bold tracking-tight">KosanKu</span>
+    <footer id="contact" className="hairline-t scroll-mt-20 bg-ground">
+      <div className="mx-auto max-w-7xl px-5 pb-10 pt-12 md:px-6">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+          <div className="sm:col-span-2 md:col-span-1">
+            <Link href="/" className="font-headline text-[17px] text-ink-12">
+              KosanKu
             </Link>
-            <p className="mt-5 max-w-xs leading-relaxed text-primary-foreground">
+            <p className="mt-3 max-w-xs text-sm text-ink-11 max-md:text-[15px]">
               Kos nyaman dengan harga yang jelas dan pembayaran yang mudah.
             </p>
           </div>
 
-          {/* Card Menu */}
-          <nav aria-label="Menu footer" className={cardClass}>
+          <nav aria-label="Menu footer">
             <p className={labelClass}>Menu</p>
-            <ul className="mt-5 flex flex-col gap-1">
+            <ul className="mt-3 flex flex-col">
               {menu.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className={linkClass}>
-                    <span className={garisClass} />
                     {item.label}
                   </Link>
                 </li>
               ))}
               <li>
                 <button type="button" onClick={() => openModal("daftar")} className={linkClass}>
-                  <span className={garisClass} />
                   Daftar
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => openModal("masuk")} className={linkClass}>
-                  <span className={garisClass} />
                   Masuk
                 </button>
               </li>
             </ul>
           </nav>
 
-          {/* Card Kontak: tujuan link "Contact" di navbar */}
-          <div id="contact" className={`${cardClass} scroll-mt-20`}>
+          <div>
             <p className={labelClass}>Kontak</p>
-            <ul className="mt-5 flex flex-col gap-4">
+            <ul className="mt-3 flex flex-col gap-3">
               <li>
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="group flex items-center gap-3 text-primary-foreground"
-                >
-                  <span className={`${ikonClass} group-hover:border-primary-foreground group-hover:bg-background group-hover:text-foreground`}>
-                    <Mail size={17} />
-                  </span>
+                <a href={`mailto:${EMAIL}`} className={`${kontakClass} transition-colors duration-150 hover:text-ink-12`}>
+                  <Mail size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
                   <span className="break-all">{EMAIL}</span>
                 </a>
               </li>
               <li>
                 <a
                   href={`tel:${TELEPON.replace(/\s/g, "")}`}
-                  className="group flex items-center gap-3 text-primary-foreground"
+                  className={`${kontakClass} transition-colors duration-150 hover:text-ink-12`}
                 >
-                  <span className={`${ikonClass} group-hover:border-primary-foreground group-hover:bg-background group-hover:text-foreground`}>
-                    <Phone size={17} />
-                  </span>
+                  <Phone size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
                   {TELEPON}
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-primary-foreground">
-                <span className={ikonClass}>
-                  <MapPin size={17} />
-                </span>
+              <li className={kontakClass}>
+                <MapPin size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
                 Dekat kampus dan pusat kota
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Baris bawah */}
-        <div className="mt-8 flex items-center justify-between gap-4 pb-[env(safe-area-inset-bottom)] text-sm text-primary-foreground">
-          <p>© KosanKu. All rights reserved.</p>
-          <a
-            href="/#home"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-primary-foreground/70"
-          >
-            Ke atas <ArrowUp size={14} />
-          </a>
+        <div className="hairline-t mt-10 flex items-center justify-between gap-4 pt-6 pb-[env(safe-area-inset-bottom)]">
+          <p className="text-meta">© KosanKu. Semua hak dilindungi.</p>
+          <Link href="/#home" className="btn btn-ghost btn-sm max-md:h-11">
+            Ke atas
+          </Link>
         </div>
       </div>
     </footer>

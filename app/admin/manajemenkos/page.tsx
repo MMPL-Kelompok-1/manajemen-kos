@@ -6,24 +6,7 @@ import ManajemenKosView from "@/components/admin/ManajemenKosView";
 
 export default function ManajemenKosPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="w-full bg-surface px-space-lg min-h-screen text-on-surface p-8 space-y-6">
-          <div className="skeleton h-8 w-64 rounded-lg"></div>
-          <div className="skeleton h-4 w-96 rounded-lg"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="skeleton h-32 rounded-xl"></div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pt-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="skeleton h-64 rounded-xl"></div>
-            ))}
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<ManajemenKosSkeleton />}>
       <ManajemenKosContent />
     </Suspense>
   );
@@ -38,4 +21,35 @@ async function ManajemenKosContent() {
   const data = await getRoomManagementData();
 
   return <ManajemenKosView initialData={data} />;
+}
+
+function ManajemenKosSkeleton() {
+  return (
+    <div role="status" className="mx-auto max-w-[1200px] space-y-8 px-5 py-6 pb-12 md:px-6 md:py-8">
+      <span className="sr-only">Memuat…</span>
+      <div className="space-y-2">
+        <span className="skeleton h-7 w-64 max-w-full" />
+        <span className="skeleton h-5 w-80 max-w-full" />
+      </div>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="surface-raised flex flex-col gap-2 p-4">
+            <span className="skeleton h-8 w-16" />
+            <span className="skeleton h-5 w-28" />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="surface-raised overflow-hidden">
+            <span className="skeleton h-40 rounded-none" />
+            <div className="space-y-2 p-4">
+              <span className="skeleton h-6 w-32" />
+              <span className="skeleton h-5 w-24" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

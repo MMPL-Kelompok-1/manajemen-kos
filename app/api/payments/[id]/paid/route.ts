@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { markPaymentPaid } from "@/lib/data";
+import { markPaymentPaid } from "@/lib/services/payment";
 import { requireRole } from "@/lib/auth";
 import { errorResponse } from "@/lib/http";
 

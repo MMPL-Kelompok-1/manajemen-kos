@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { setRoomNumber } from "@/lib/data";
+import { setRoomNumber } from "@/lib/services/room";
 import { requireRole } from "@/lib/auth";
 import { errorResponse, readJson } from "@/lib/http";
 

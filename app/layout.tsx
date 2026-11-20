@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import Script from "next/script"; // 1. Impor Script dari next/script
+import Script from "next/script";
 import "./globals.css";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "KosanKu — Find Your Perfect Sanctuary",
+  title: {
+    default: "KosanKu: cari dan sewa kos",
+    template: "%s | KosanKu",
+  },
   description:
     "Temukan kos nyaman dengan harga yang jelas dan pembayaran yang mudah.",
 };
@@ -13,6 +16,11 @@ export const metadata: Metadata = {
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-jakarta",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const viewport = {
@@ -29,17 +37,11 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className="h-full antialiased scroll-smooth"
+      className={`${inter.variable} ${jakarta.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        />
-
-      </head>
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex min-h-full flex-col bg-background text-ink-12">
         {children}
         <ThemeToggle />
         <Script

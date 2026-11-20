@@ -1,4 +1,3 @@
-// app/admin/dashboard/page.tsx
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";

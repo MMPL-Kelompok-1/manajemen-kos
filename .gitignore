@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -43,3 +44,25 @@ next-env.d.ts
 # runtime data (jangan di-commit)
 /data/registrations.json
 /data/payments.json
+
+# AI / agent tools (jangan di-push)
+AGENTS.md
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+.agents/
+.claude/
+.opencode/
+opencode.json
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.clinerules
+.roo/
+.continue/
+.aider*
+.codex/
+.gemini/
+.github/copilot-instructions.md
+skills-lock.json

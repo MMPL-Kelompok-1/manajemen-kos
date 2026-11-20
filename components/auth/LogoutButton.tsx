@@ -7,15 +7,18 @@ import { LogOut } from "lucide-react";
 export default function LogoutButton({ redirectTo = "/" }: { redirectTo?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function logout() {
+    setLoading(true);
+    setFailed(false);
     try {
-      setLoading(true);
-      await fetch("/api/auth/logout", { method: "POST" });
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) throw new Error("logout failed");
       router.replace(redirectTo);
       router.refresh();
-    } catch (error) {
-      console.error("Logout failed:", error);
+    } catch {
+      setFailed(true);
       setLoading(false);
     }
   }
@@ -25,10 +28,12 @@ export default function LogoutButton({ redirectTo = "/" }: { redirectTo?: string
       type="button"
       onClick={logout}
       disabled={loading}
-      className="flex items-center gap-2 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
+      className={`btn btn-secondary shrink-0 ${failed ? "text-red-11" : ""}`}
     >
-      <LogOut size={16} />
-      <span>{loading ? "Keluar..." : "Keluar"}</span>
+      <LogOut size={16} className="text-ink-11" aria-hidden="true" />
+      <span role={failed ? "alert" : undefined}>
+        {loading ? "Keluar…" : failed ? "Gagal keluar, coba lagi" : "Keluar"}
+      </span>
     </button>
   );
 }

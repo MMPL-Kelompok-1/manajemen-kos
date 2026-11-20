@@ -1,39 +1,30 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import Segmented from "@/components/ui/Segmented";
+import { errorMessage, postJson } from "@/lib/client/http";
 
 type Tab = "masuk" | "daftar";
 
 interface AuthFormsProps {
+  /** Tab awal. Untuk mengganti tab dari luar, ubah `key` komponen ini. */
   initialTab?: Tab;
   kosId?: string | null;
   isModal?: boolean;
   onClose?: () => void;
 }
 
-// Form masuk & daftar untuk penghuni / calon penghuni.
-export default function AuthForms({
-  initialTab = "masuk",
-  kosId = null,
-  isModal = false,
-  onClose,
-}: AuthFormsProps) {
+export default function AuthForms({ initialTab = "masuk", kosId = null, isModal = false, onClose }: AuthFormsProps) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>(initialTab);
   const [form, setForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    setTab(initialTab);
-    setError("");
-  }, [initialTab]);
-
   const isRegister = tab === "daftar";
-  const inputClass =
-    "mt-1.5 w-full rounded-2xl border border-border bg-muted px-4 py-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:bg-card sm:text-sm";
+  const Heading = isModal ? "h2" : "h1";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,18 +36,8 @@ export default function AuthForms({
       : { email: form.email, password: form.password };
 
     try {
-      const res = await fetch(isRegister ? "/api/auth/register" : "/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Gagal. Coba lagi.");
-
-      if (isModal && onClose) {
-        onClose();
-      }
-
+      const data = await postJson<{ role?: string }>(isRegister ? "/api/auth/register" : "/api/auth/login", body);
+      onClose?.();
       const target =
         data.role === "owner"
           ? "/admin/dashboard"
@@ -66,65 +47,74 @@ export default function AuthForms({
       router.replace(target);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Terjadi kesalahan. Coba lagi.");
+      setError(errorMessage(err));
       setLoading(false);
     }
   }
 
   return (
-    <div className={isModal ? "w-full" : "mx-auto w-full max-w-md px-5 py-12 sm:py-20"}>
-      <div className="relative rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
-        {isModal && onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Tutup"
-            className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-          >
-            <X size={18} />
-          </button>
-        )}
-
-        <div className={`grid grid-cols-2 rounded-full bg-muted p-1 text-sm font-semibold ${isModal ? "mt-5" : ""}`}>
-          {(["masuk", "daftar"] as Tab[]).map((value) => (
+    <div className={isModal ? "w-full" : "mx-auto w-full max-w-[440px] px-5 py-12 sm:py-20"}>
+      <div
+        className={`relative p-5 pb-[max(20px,env(safe-area-inset-bottom))] sm:p-6 ${
+          isModal
+            ? "surface-overlay animate-modal-in rounded-b-none rounded-t-[14px] md:rounded-container"
+            : "surface-raised rounded-container"
+        }`}
+      >
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <Heading id={isModal ? "auth-modal-title" : undefined} className="text-title">
+            {isRegister ? "Buat akun KosanKu" : "Masuk ke KosanKu"}
+          </Heading>
+          {isModal && onClose && (
             <button
-              key={value}
               type="button"
-              onClick={() => {
-                setTab(value);
-                setError("");
-              }}
-              className={`rounded-full py-2.5 capitalize transition ${tab === value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                }`}
+              onClick={onClose}
+              aria-label="Tutup"
+              className="btn btn-ghost btn-icon btn-sm -mr-2 -mt-1 max-md:size-11"
             >
-              {value === "masuk" ? "Masuk" : "Daftar"}
+              <X size={16} aria-hidden="true" />
             </button>
-          ))}
+          )}
         </div>
 
+        <Segmented<Tab>
+          label="Pilih masuk atau daftar"
+          value={tab}
+          onChange={(value) => {
+            setTab(value);
+            setError("");
+          }}
+          className="flex w-full"
+          options={[
+            { value: "masuk", label: "Masuk" },
+            { value: "daftar", label: "Daftar" },
+          ]}
+        />
+
         {kosId && (
-          <p className="mt-5 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
+          <p className="mt-4 rounded-control bg-ink-3 p-3 text-sm text-ink-11">
             Setelah {isRegister ? "mendaftar" : "masuk"}, kos pilihan Anda akan diproses untuk pembayaran.
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {isRegister && (
             <>
-              <label className="block text-sm font-semibold text-foreground">
-                Nama lengkap
+              <label className="block">
+                <span className="field-label">Nama lengkap</span>
                 <input
+                  data-autofocus
                   required
                   minLength={3}
                   autoComplete="name"
                   placeholder="Nama lengkap Anda"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className={inputClass}
+                  className="field"
                 />
               </label>
-              <label className="block text-sm font-semibold text-foreground">
-                Nomor HP
+              <label className="block">
+                <span className="field-label">Nomor HP</span>
                 <input
                   required
                   type="tel"
@@ -133,15 +123,16 @@ export default function AuthForms({
                   placeholder="081234567890"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className={inputClass}
+                  className="field"
                 />
               </label>
             </>
           )}
 
-          <label className="block text-sm font-semibold text-foreground">
-            Gmail
+          <label className="block">
+            <span className="field-label">Gmail</span>
             <input
+              data-autofocus={isRegister ? undefined : true}
               required
               type="email"
               inputMode="email"
@@ -151,12 +142,12 @@ export default function AuthForms({
               placeholder="nama@gmail.com"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className={inputClass}
+              className="field"
             />
           </label>
 
-          <label className="block text-sm font-semibold text-foreground">
-            Kata sandi
+          <label className="block">
+            <span className="field-label">Kata sandi</span>
             <input
               required
               type="password"
@@ -165,30 +156,22 @@ export default function AuthForms({
               placeholder={isRegister ? "Minimal 8 karakter" : "••••••••"}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className={inputClass}
+              className="field"
             />
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-red-3 p-3 text-sm text-red-11">
+            <p role="alert" className="field-error">
               {error}
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-full bg-primary py-3 font-medium text-primary-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"
-          >
-            {loading ? "Memproses..." : isRegister ? "Daftar akun" : "Masuk"}
+          <button type="submit" disabled={loading} className="btn btn-primary w-full max-md:h-11">
+            {loading ? "Memproses…" : isRegister ? "Daftar akun" : "Masuk"}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Admin dan penghuni menggunakan halaman masuk yang sama.
-        </p>
+        <p className="text-meta mt-4 text-center">Admin dan penghuni menggunakan halaman masuk yang sama.</p>
       </div>
-
     </div>
   );
 }
-

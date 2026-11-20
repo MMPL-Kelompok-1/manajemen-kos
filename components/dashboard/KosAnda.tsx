@@ -3,41 +3,25 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Bath,
-  CalendarClock,
-  DoorOpen,
-  KeyRound,
-  MapPin,
-  Ruler,
-  Sparkles,
-  Wallet,
-} from "lucide-react";
+import { KeyRound, MapPin } from "lucide-react";
 import ListingImage from "@/components/ListingImage";
 import StatusBadge from "@/components/StatusBadge";
+import EmptyState from "@/components/ui/EmptyState";
+import Notice from "@/components/ui/Notice";
+import { DefinitionList } from "@/components/ui/DefinitionList";
 import { formatDate, formatRupiah } from "@/lib/format";
+import { errorMessage, postJson } from "@/lib/client/http";
 import type { UserDashboardData } from "@/lib/data";
-import { postJson } from "./postJson";
 
 type Props = {
   data: UserDashboardData;
   pendingKosId: string | null;
 };
 
-// Data tambahan kos (ada di data kos, dibaca dengan aman jika sebagian kosong).
-type KosExtra = {
-  photos?: string[];
-  facilities?: string[];
-  gender?: string;
-  bathroom?: string;
-  description?: string;
-};
-
 const pesanStatus: Record<string, string> = {
   belum_bayar: "Tagihan bulan ini belum dibayar. Transfer sebelum jatuh tempo ya.",
   menunggu_konfirmasi: "Pembayaranmu sedang dikonfirmasi oleh pemilik kos.",
-  lunas: "Pembayaran sudah lunas. Terima kasih, tidak ada tagihan yang perlu diselesaikan.",
+  lunas: "Pembayaran sudah lunas. Tidak ada tagihan yang perlu diselesaikan.",
   terlambat: "Tagihan sudah melewati jatuh tempo. Segera lakukan pembayaran.",
 };
 
@@ -58,7 +42,7 @@ export default function KosAnda({ data, pendingKosId }: Props) {
       try {
         await postJson("/api/payments", { kosId: pendingKosId });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Gagal membuat tagihan.");
+        setError(errorMessage(err, "Gagal membuat tagihan."));
         tujuan = "/dashboard";
       } finally {
         setBusy(false);
@@ -68,153 +52,103 @@ export default function KosAnda({ data, pendingKosId }: Props) {
     })();
   }, [pendingKosId, router]);
 
-  const extra = (kos ?? {}) as unknown as KosExtra;
-  const fasilitas = extra.facilities ?? [];
-  const nomorKamar = account.roomNumber ?? "Belum ditentukan";
+  const fasilitas = kos?.facilities ?? [];
 
   return (
-    <div className="space-y-5">
-      {/* Sapaan */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">Dashboard penghuni</p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-            Halo, <span className="capitalize">{account.name}</span>
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Semua informasi tentang kos dan pembayaranmu ada di sini.
-          </p>
-        </div>
-        {kos && <StatusBadge status={status} />}
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-section">
+          Halo, <span className="capitalize">{account.name}</span>
+        </h1>
+        <p className="mt-1.5 text-sm text-ink-11">Semua informasi tentang kos dan pembayaranmu ada di sini.</p>
       </div>
 
-      {busy && (
-        <p role="status" className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
-          Membuat tagihan untuk kos pilihanmu...
-        </p>
-      )}
-
-      {error && (
-        <p role="alert" className="rounded-2xl bg-red-3 p-4 text-sm text-red-11">
-          {error}
-        </p>
-      )}
+      {busy && <Notice>Membuat tagihan untuk kos pilihanmu…</Notice>}
+      {error && <Notice tone="red">{error}</Notice>}
 
       {kos ? (
         <>
-          {/* Foto dan nama kos */}
-          <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-            <div className="relative h-52 sm:h-72">
-              <ListingImage src={extra.photos?.[0] ?? ""} alt={kos.name} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 p-5 text-white sm:p-6">
-                <div>
-                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/70">
-                    <KeyRound size={13} /> Kos Anda
-                  </p>
-                  <h3 className="mt-1 text-2xl font-bold sm:text-3xl">{kos.name}</h3>
-                  <p className="mt-1 flex items-center gap-1 text-sm text-white/80">
-                    <MapPin size={14} /> {kos.area}
-                  </p>
-                </div>
-                <span className="rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-zinc-950">
-                  Kamar {nomorKamar}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* Ringkasan singkat */}
-          <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {[
-              { icon: DoorOpen, label: "Nomor kamar", value: String(nomorKamar) },
-              { icon: Wallet, label: "Harga / bulan", value: formatRupiah(kos.price) },
-              { icon: Ruler, label: "Ukuran kamar", value: kos.roomSize },
-              { icon: CalendarClock, label: "Jatuh tempo", value: formatDate(dueAt) },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="rounded-2xl border border-border bg-card p-4">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-                  <Icon size={18} />
-                </span>
-                <p className="mt-3 text-xs text-muted-foreground">{label}</p>
-                <p className="mt-0.5 font-bold">{value}</p>
-              </div>
-            ))}
-          </section>
-
-          {/* Status pembayaran */}
-          <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <div>
-              <p className="text-sm font-semibold text-muted-foreground">Status pembayaran</p>
-              <div className="mt-2">
+          <section className="surface-raised flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h2 className="text-title">Status pembayaran</h2>
                 <StatusBadge status={status} />
               </div>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-1 max-w-md text-sm text-ink-11">
                 {pesanStatus[status] ?? "Lihat detail tagihanmu di halaman pembayaran."}
               </p>
             </div>
             <Link
               href="/dashboard/pembayaran"
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
+              className={`btn shrink-0 max-sm:w-full ${
+                status === "belum_bayar" || status === "terlambat" ? "btn-primary" : "btn-secondary"
+              }`}
             >
-              Lihat pembayaran <ArrowRight size={16} />
+              Lihat pembayaran
             </Link>
           </section>
 
-          {/* Tentang kamar */}
-          <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
-            <p className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-              <Sparkles size={16} /> Tentang kamarmu
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {extra.gender && (
-                <span className="rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">
-                  {extra.gender}
-                </span>
-              )}
-              {extra.bathroom && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm">
-                  <Bath size={14} /> KM {extra.bathroom}
-                </span>
-              )}
-              {fasilitas.map((item) => (
-                <span key={item} className="rounded-full border border-border px-3 py-1.5 text-sm">
-                  {item}
-                </span>
-              ))}
+          <section className="surface-raised overflow-hidden">
+            <div className="relative h-44 sm:h-60">
+              <ListingImage src={kos.photos?.[0] ?? ""} alt={kos.name} />
             </div>
+            <div className="p-5">
+              <h2 className="text-title">{kos.name}</h2>
+              {kos.area && (
+                <p className="mt-0.5 flex items-center gap-1 text-sm text-ink-11">
+                  <MapPin size={14} className="shrink-0 text-ink-10" aria-hidden="true" /> {kos.area}
+                </p>
+              )}
 
-            <div className="mt-5 flex items-start gap-3 rounded-2xl bg-muted/50 p-4">
-              <MapPin size={18} className="mt-0.5 shrink-0 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Alamat</p>
-                <p className="font-semibold">{kos.address}</p>
-              </div>
+              <DefinitionList
+                size="lead"
+                className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 lg:grid-cols-4"
+                items={[
+                  { label: "Nomor kamar", value: account.roomNumber ?? "Belum ditentukan" },
+                  { label: "Harga / bulan", value: formatRupiah(kos.price) },
+                  { label: "Ukuran kamar", value: kos.roomSize || "–" },
+                  { label: "Jatuh tempo", value: formatDate(dueAt) },
+                ]}
+              />
+
+              {(kos.gender || kos.bathroom || fasilitas.length > 0) && (
+                <ul aria-label="Fasilitas" className="hairline-t mt-5 flex flex-wrap gap-1.5 pt-5">
+                  {kos.gender && <li className="badge badge-neutral">{kos.gender}</li>}
+                  {kos.bathroom && <li className="badge badge-neutral">KM {kos.bathroom}</li>}
+                  {fasilitas.map((item) => (
+                    <li key={item} className="badge badge-neutral">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {(kos.address || kos.description) && (
+                <div className="hairline-t mt-5 pt-5">
+                  {kos.address && (
+                    <>
+                      <p className="text-sm text-ink-10">Alamat</p>
+                      <p className="mt-0.5 text-sm text-ink-12">{kos.address}</p>
+                    </>
+                  )}
+                  {kos.description && <p className="mt-3 text-sm text-ink-11">{kos.description}</p>}
+                </div>
+              )}
             </div>
-
-            {extra.description && (
-              <p className="mt-5 leading-relaxed text-muted-foreground">{extra.description}</p>
-            )}
           </section>
         </>
       ) : (
-        <section className="rounded-3xl border border-dashed border-border bg-card p-8 text-center sm:p-12">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-            <KeyRound size={26} />
-          </span>
-          <h3 className="mt-5 text-xl font-bold">Kamu belum memilih kos</h3>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Pilih kamar yang sesuai, lalu daftar dan bayar langsung dari akunmu. Informasi
-            kamar akan tampil di halaman ini.
-          </p>
-          <Link
-            href="/#product"
-            className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
-          >
-            Lihat kos yang tersedia <ArrowRight size={16} />
-          </Link>
-        </section>
+        <EmptyState
+          icon={KeyRound}
+          headingLevel="h2"
+          title="Kamu belum memilih kos"
+          description="Pilih kamar yang sesuai, lalu daftar dan bayar langsung dari akunmu."
+          action={
+            <Link href="/#product" className="btn btn-primary">
+              Lihat kos yang tersedia
+            </Link>
+          }
+        />
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { getUserDashboard } from "@/lib/data";
+import { getUserDashboard } from "@/lib/services/dashboard";
 
 // Dipakai semua halaman /dashboard: cek login, lalu ambil data penghuni.
 export async function requireUserDashboard() {

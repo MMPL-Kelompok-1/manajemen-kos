@@ -1,24 +1,15 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { connection } from "next/server";
+import { MapPin } from "lucide-react";
 import ProductGallery from "@/components/ProductGallery";
 import { formatRupiah } from "@/lib/format";
-// TODO: ganti getKosList dengan fungsi yang dipakai app/(public)/page.tsx
-// untuk mengambil daftar kos dari "@/lib/data".
-import { getKosList } from "@/lib/data";
+import { getKos } from "@/lib/data";
 
-export default function DetailKosPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function DetailKosPage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-7xl px-5 py-16 md:px-6">Memuat...</div>
-      }
-    >
+    <Suspense fallback={<DetailSkeleton />}>
       <DetailProduct params={params} />
     </Suspense>
   );
@@ -26,94 +17,90 @@ export default function DetailKosPage({
 
 async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const kosList = await getKosList();
-  const kos = kosList.find((item) => item.id === decodeURIComponent(id));
+  // getKos membaca waktu sekarang (pesanan tertunda yang masih aktif), jadi halaman ini dinamis.
+  await connection();
+  const kos = await getKos(decodeURIComponent(id));
 
   if (!kos) notFound();
 
   const full = kos.roomsLeft <= 0;
-  const specs = [
-    ["Jenis kos", kos.gender],
-    ["Ukuran kamar", kos.roomSize],
-    ["Kamar mandi", `KM ${kos.bathroom}`],
-    ["Area", kos.area],
-    ["Ketersediaan", full ? "Penuh" : `Sisa ${kos.roomsLeft} kamar`],
-    ["Alamat", kos.address],
-  ];
+  const specs = (
+    [
+      ["Jenis kos", kos.gender],
+      ["Ukuran kamar", kos.roomSize],
+      ["Kamar mandi", kos.bathroom ? `KM ${kos.bathroom}` : ""],
+      ["Area", kos.area],
+      ["Ketersediaan", full ? "Penuh" : `Sisa ${kos.roomsLeft} kamar`],
+      ["Alamat", kos.address],
+    ] as const
+  ).filter(([, value]) => Boolean(value));
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 md:px-6 md:py-12">
-      <Link
-        href="/#products"
-        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft size={16} /> Kembali ke daftar kos
+      <Link href="/#product" className="btn btn-pill max-md:h-11">
+        Kembali ke daftar kos
       </Link>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-12">
-        {/* Kolom kiri: foto, spesifikasi, fasilitas, deskripsi */}
+      <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-10">
         <div>
           <ProductGallery photos={kos.photos} name={kos.name} />
 
-          <h2 className="mt-10 text-xl font-bold">Spesifikasi</h2>
-          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          <h2 className="text-section mt-8">Spesifikasi</h2>
+          <dl className="mt-4 grid gap-x-6 sm:grid-cols-2">
             {specs.map(([label, value]) => (
-              <div key={label} className="border-b border-border pb-3">
-                <dt className="text-sm text-muted-foreground">{label}</dt>
-                <dd className="font-semibold">{value}</dd>
+              <div key={label} className="hairline-b py-3">
+                <dt className="text-meta">{label}</dt>
+                <dd className="mt-0.5 text-sm text-ink-12 max-md:text-[15px]">{value}</dd>
               </div>
             ))}
           </dl>
 
-          <h2 className="mt-10 text-xl font-bold">Fasilitas</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {kos.facilities.map((item) => (
-              <li
-                key={item}
-                className="rounded-full border border-border px-4 py-1.5 text-sm"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+          {kos.facilities.length > 0 && (
+            <>
+              <h2 className="text-section mt-8">Fasilitas</h2>
+              <ul className="mt-4 flex flex-wrap gap-1.5">
+                {kos.facilities.map((item) => (
+                  <li key={item} className="rounded-control bg-ink-3 px-2.5 py-1 text-sm text-ink-11">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
 
-          <h2 className="mt-10 text-xl font-bold">Deskripsi</h2>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            {kos.description}
-          </p>
+          {kos.description && (
+            <>
+              <h2 className="text-section mt-8">Deskripsi</h2>
+              <p className="mt-2 max-w-[65ch] text-sm text-ink-11 max-md:text-[15px]">{kos.description}</p>
+            </>
+          )}
         </div>
 
-        {/* Kolom kanan: ringkasan harga dan tombol daftar */}
-        <aside className="h-fit rounded-3xl border border-border p-6 lg:sticky lg:top-24">
+        <aside className="surface-raised h-fit rounded-container p-5 lg:sticky lg:top-24">
           <div className="flex items-start justify-between gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">{kos.name}</h1>
-            <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-semibold">
-              {kos.gender}
-            </span>
+            <h1 className="text-section">{kos.name}</h1>
+            {kos.gender && <span className="badge badge-neutral shrink-0">{kos.gender}</span>}
           </div>
-          <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-            <MapPin size={14} /> {kos.area}
-          </p>
+          {kos.area && (
+            <p className="mt-1 flex items-center gap-1 text-sm text-ink-11">
+              <MapPin size={14} aria-hidden="true" /> {kos.area}
+            </p>
+          )}
 
-          <p className="mt-6 text-3xl font-bold">
-            {formatRupiah(kos.price)}
-            <span className="text-sm font-normal text-muted-foreground">
-              {" "}
-              / bulan
-            </span>
+          <p className="mt-6">
+            <span className="text-figure">{formatRupiah(kos.price)}</span>
+            <span className="text-meta"> / bulan</span>
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {full ? "Kamar penuh" : `Sisa ${kos.roomsLeft} kamar`}
-          </p>
+          <p className="mt-0.5 text-sm text-ink-11">{full ? "Kamar penuh" : `Sisa ${kos.roomsLeft} kamar`}</p>
 
           {full ? (
-            <span className="mt-6 block rounded-full bg-muted py-3 text-center text-sm font-medium text-muted-foreground">
-              Kamar penuh
-            </span>
+            <p className="mt-5 rounded-control bg-ink-3 p-3 text-sm text-ink-11">
+              Kamar ini sedang penuh. Pilih kamar lain di daftar kos.
+            </p>
           ) : (
             <Link
               href={`/login?tab=daftar&kos=${encodeURIComponent(kos.id)}`}
-              className="mt-6 block rounded-full bg-primary py-3 text-center text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
+              className="btn btn-primary mt-5 w-full max-md:h-11"
             >
               Pilih & daftar
             </Link>
@@ -121,5 +108,23 @@ async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
         </aside>
       </div>
     </main>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <div role="status" className="mx-auto max-w-7xl px-5 py-8 md:px-6 md:py-12">
+      <span className="sr-only">Memuat…</span>
+      <span className="skeleton h-7 w-40 rounded-full" />
+      <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-10">
+        <span className="skeleton aspect-[16/10] w-full rounded-feature" />
+        <div className="surface-raised h-fit space-y-3 p-5">
+          <span className="skeleton h-7 w-48" />
+          <span className="skeleton h-5 w-32" />
+          <span className="skeleton mt-6 h-8 w-40" />
+          <span className="skeleton h-9 w-full" />
+        </div>
+      </div>
+    </div>
   );
 }

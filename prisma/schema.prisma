@@ -71,8 +71,8 @@ model Room {
   orders      Order[]
   reviews     Review[]
 
+  @@unique([room_number])
   @@index([status])
-  @@index([room_number])
 }
 
 model Order {

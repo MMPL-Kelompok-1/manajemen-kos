@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import KosAnda from "@/components/dashboard/KosAnda";
 import { requireUserDashboard } from "@/lib/user-dashboard";
 
@@ -6,7 +7,7 @@ type Props = { searchParams: Promise<{ kos?: string }> };
 
 export default function DashboardPage(props: Props) {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Memuat...</p>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <Content {...props} />
     </Suspense>
   );

@@ -71,7 +71,7 @@ export default function ThemeToggle() {
       aria-label={`Ganti ke tema ${nextThemeLabel}`}
       aria-pressed={theme === "dark"}
       title={`Ganti ke tema ${nextThemeLabel}`}
-      className="fixed bottom-5 right-5 z-100 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-lg transition hover:bg-muted"
+      className="btn btn-secondary btn-icon fixed bottom-5 right-5 z-100 rounded-full! text-ink-12"
     >
       {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
     </button>

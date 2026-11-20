@@ -1,61 +1,39 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRef } from "react";
 import { useAuthModal } from "./AuthModalContext";
 import AuthForms from "./AuthForms";
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 
 export default function AuthModal() {
-  const { isOpen, tab, kosId, closeModal } = useAuthModal();
-
-  // Handle escape key
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeModal();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeModal]);
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isOpen]);
-
+  const { isOpen } = useAuthModal();
   if (!isOpen) return null;
+  return <OpenAuthModal />;
+}
+
+// Dipasang hanya saat terbuka; fokus, Escape, dan kunci scroll ditangani useFocusTrap.
+function OpenAuthModal() {
+  const { tab, kosId, closeModal } = useAuthModal();
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef, true, closeModal);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="auth-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-    >
-      {/* Backdrop overlay with blur */}
+    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6">
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        className="animate-fade-in fixed inset-0 backdrop-blur-[2px]"
+        style={{ background: "var(--backdrop)" }}
         onClick={closeModal}
         aria-hidden="true"
       />
-
-      {/* Modal Dialog Content */}
-      <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <AuthForms
-          initialTab={tab}
-          kosId={kosId}
-          isModal={true}
-          onClose={closeModal}
-        />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title"
+        className="relative z-10 max-h-[92svh] w-full overflow-y-auto md:max-w-[440px]"
+      >
+        {/* key: tab dari luar berubah = form dipasang ulang, tanpa menyalin state lewat effect. */}
+        <AuthForms key={`${tab}:${kosId ?? ""}`} initialTab={tab} kosId={kosId} isModal onClose={closeModal} />
       </div>
     </div>
   );

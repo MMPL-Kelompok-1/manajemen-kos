@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse, connection } from "next/server";
-import { ApiError } from "@/lib/data";
+import { ApiError } from "@/lib/errors";
 import {
   SESSION_COOKIE,
   createSessionToken,
@@ -45,7 +45,6 @@ export async function requireRole(role: Role): Promise<Session> {
   return session;
 }
 
-// Menyimpan cookie sesi pada response.
 export function withSession(response: NextResponse, id: string, role: Role): NextResponse {
   response.cookies.set(SESSION_COOKIE, createSessionToken(id, role), sessionCookieOptions);
   return response;

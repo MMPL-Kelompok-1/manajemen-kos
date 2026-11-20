@@ -15,8 +15,7 @@ export default function ListingImage({
   const [failed, setFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Error gambar bisa terjadi sebelum hydration selesai, sehingga event onError terlewat.
-  // Periksa status gambar setelah mount.
+  // onError bisa terlewat bila gambar gagal sebelum hydration, jadi cek ulang setelah mount.
   useEffect(() => {
     const img = imgRef.current;
     if (img && img.complete && img.naturalWidth === 0) setFailed(true);
@@ -25,7 +24,7 @@ export default function ListingImage({
   if (!src || failed) {
     return (
       <div
-        className={`flex h-full w-full items-center justify-center bg-muted px-3 text-center text-sm text-muted-foreground ${className}`}
+        className={`flex h-full w-full items-center justify-center bg-well px-3 text-center text-sm text-ink-10 ${className}`}
       >
         {alt}
       </div>

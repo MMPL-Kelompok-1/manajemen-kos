@@ -1,10 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   devIndicators: false,
+  async redirects() {
+    return [
+      { source: "/admin", destination: "/admin/dashboard", permanent: false },
+      { source: "/admin/login", destination: "/login", permanent: true },
+    ];
+  },
   experimental: {
     agentFeedback: true,
+    agentUpgrade: "security",
   },
   cacheComponents: true,
   partialPrefetching: true,

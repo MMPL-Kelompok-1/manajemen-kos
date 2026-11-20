@@ -1,10 +1,11 @@
 import { Suspense } from "react";
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import HistoriPesanan from "@/components/dashboard/HistoriPesanan";
 import { requireUserDashboard } from "@/lib/user-dashboard";
 
 export default function HistoriPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Memuat...</p>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <Content />
     </Suspense>
   );

@@ -18,9 +18,57 @@ export function formatDate(iso: string | null | undefined): string {
   }).format(new Date(iso));
 }
 
-// Menambah satu bulan (dipakai untuk jatuh tempo sewa bulanan).
 export function addOneMonth(iso: string): string {
   const date = new Date(iso);
   date.setMonth(date.getMonth() + 1);
   return date.toISOString();
+}
+
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Agu",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Des",
+];
+
+// Kunci bulan YYYY-MM menurut zona Asia/Jakarta, dipakai untuk laporan keuangan.
+export function jakartaMonthKey(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  return `${year}-${month}`;
+}
+
+export function currentJakartaMonthKey(now: Date = new Date()): string {
+  return jakartaMonthKey(now);
+}
+
+// Batas awal dan akhir bulan (zona Asia/Jakarta) untuk kueri database.
+export function jakartaMonthBounds(monthKey: string): { start: Date; end: Date } {
+  const [year, month] = monthKey.split("-").map(Number);
+  const nextMonth = month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, "0")}`;
+  return {
+    start: new Date(`${monthKey}-01T00:00:00+07:00`),
+    end: new Date(`${nextMonth}-01T00:00:00+07:00`),
+  };
+}
+
+// Label pendek dari kunci YYYY-MM, contoh: "Nov 2026".
+export function formatMonthKey(monthKey: string): string {
+  const [year, month] = monthKey.split("-");
+  const label = MONTH_LABELS[Number(month) - 1] ?? month;
+  return `${label} ${year}`;
 }

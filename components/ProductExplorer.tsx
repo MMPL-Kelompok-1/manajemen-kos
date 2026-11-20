@@ -1,104 +1,83 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin } from "lucide-react";
 import ListingImage from "@/components/ListingImage";
+import EmptyState from "@/components/ui/EmptyState";
 import { formatRupiah } from "@/lib/format";
 import type { Kos } from "@/lib/data";
 
 export default function ProductExplorer({ items = [] }: { items?: Kos[] }) {
   return (
     <section id="product" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
-      {/* Header Section terpusat */}
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-bold uppercase tracking-wider text-primary">
-          Pilihan Kamar
-        </p>
-        <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl">
-          Temukan Kamar Impian Anda
-        </h2>
-        <p className="mt-4 text-base text-muted-foreground md:text-lg">
-          Pilih kamar nyaman dengan fasilitas terbaik, harga transparan, dan lokasi strategis.
+      <div className="max-w-2xl">
+        <h2 className="font-headline text-section">Pilihan kamar</h2>
+        <p className="mt-1.5 text-sm text-ink-11 max-md:text-[15px]">
+          Harga per bulan, fasilitas, dan sisa kamar untuk setiap kos.
         </p>
       </div>
 
-      {/* Grid Kamar yang rapi & simetris */}
       {items.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-dashed border-border py-16 text-center">
-          <p className="text-muted-foreground">Belum ada kamar yang tersedia saat ini.</p>
+        <div className="mt-6">
+          <EmptyState
+            title="Belum ada kamar yang tersedia"
+            description="Kamar baru akan tampil di sini setelah ditambahkan pemilik kos."
+          />
         </div>
       ) : (
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <article
-              key={item.id}
-              className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg"
-            >
-              {/* Gambar & Label */}
-              <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-                <ListingImage
-                  src={item.photos[0] ?? ""}
-                  alt={item.name}
-                  className="transition duration-500 group-hover:scale-105"
-                />
-                <span className="absolute left-4 top-4 rounded-full bg-primary/95 px-3 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-sm shadow-sm">
-                  {item.gender}
-                </span>
-                <span className="absolute right-4 top-4 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-foreground backdrop-blur-sm shadow-sm">
-                  {item.roomsLeft > 0 ? `Sisa ${item.roomsLeft} kamar` : "Kamar Penuh"}
-                </span>
-              </div>
-
-              {/* Konten Kartu */}
-              <div className="flex flex-1 flex-col p-6">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-lg font-bold text-card-foreground group-hover:text-primary transition-colors">
-                    {item.name}
-                  </h3>
-                </div>
-
-                <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <MapPin size={14} className="shrink-0 text-primary" />
-                  <span className="truncate">{item.area}</span>
-                </p>
-
-                {/* Fasilitas */}
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {item.facilities.slice(0, 3).map((f) => (
-                    <span
-                      key={f}
-                      className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
-                    >
-                      {f}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => {
+            const href = `/kos/${encodeURIComponent(item.id)}`;
+            const full = item.roomsLeft <= 0;
+            return (
+              <article
+                key={item.id}
+                className="surface-raised press-card relative flex flex-col overflow-hidden rounded-container"
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-well">
+                  <ListingImage src={item.photos[0] ?? ""} alt={item.name} />
+                  <div className="absolute left-3 top-3 flex gap-1.5">
+                    <span className="badge badge-neutral">{item.gender}</span>
+                    <span className={`badge ${full ? "badge-red" : "badge-neutral"}`}>
+                      {full ? "Penuh" : `Sisa ${item.roomsLeft} kamar`}
                     </span>
-                  ))}
-                  {item.facilities.length > 3 && (
-                    <span className="rounded-lg bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-                      +{item.facilities.length - 3} lainnya
-                    </span>
-                  )}
-                </div>
-
-                {/* Footer Kartu: Harga & Tombol */}
-                <div className="mt-6 flex flex-col gap-4 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <span className="text-xs text-muted-foreground block">Mulai dari</span>
-                    <p className="text-xl font-bold text-foreground">
-                      {formatRupiah(item.price)}
-                      <span className="text-xs font-normal text-muted-foreground"> / bulan</span>
-                    </p>
                   </div>
-                  <Link
-                    href={`/kos/${encodeURIComponent(item.id)}`}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    Lihat detail
-                    <ArrowRight size={14} />
-                  </Link>
                 </div>
-              </div>
-            </article>
-          ))}
+
+                <div className="flex flex-1 flex-col p-4">
+                  <h3 className="text-title">
+                    {/* Seluruh kartu bisa diklik lewat tautan ini */}
+                    <Link href={href} className="after:absolute after:inset-0 hover:text-ink-11 transition-colors duration-150">
+                      {item.name}
+                    </Link>
+                  </h3>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink-11">
+                    <MapPin size={14} className="shrink-0 text-ink-10" aria-hidden="true" />
+                    <span className="truncate">{item.area}</span>
+                  </p>
+
+                  <ul className="mt-3 flex flex-wrap gap-1.5">
+                    {item.facilities.slice(0, 3).map((f) => (
+                      <li key={f} className="rounded-control bg-ink-3 px-2 py-0.5 text-xs text-ink-11">
+                        {f}
+                      </li>
+                    ))}
+                    {item.facilities.length > 3 && (
+                      <li className="px-1 py-0.5 text-xs text-ink-10">+{item.facilities.length - 3} lainnya</li>
+                    )}
+                  </ul>
+
+                  <div className="hairline-t mt-4 flex items-end justify-between gap-3 pt-3">
+                    <p>
+                      <span className="text-figure">{formatRupiah(item.price)}</span>
+                      <span className="text-meta"> / bulan</span>
+                    </p>
+                    <span className="text-sm text-ink-11">Lihat detail</span>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>

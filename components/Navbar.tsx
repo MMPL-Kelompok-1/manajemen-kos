@@ -1,217 +1,121 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
 import { useAuthModal } from "@/components/auth/AuthModalContext";
 
+// Hanya bagian yang benar-benar ada di landing page.
+const NAV_ITEMS = [
+  { id: "home", label: "Beranda" },
+  { id: "about", label: "Tentang" },
+  { id: "product", label: "Daftar kos" },
+  { id: "contact", label: "Kontak" },
+] as const;
+
+// Navbar publik selalu menampilkan Masuk dan Daftar. Pengguna yang sudah login
+// diarahkan ke dashboard oleh halaman /login.
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [tokenExists, setTokenExists] = useState(false);
-  const [dashboardHref, setDashboardHref] = useState("/dashboard");
   const { openModal } = useAuthModal();
-  const pathname = usePathname();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+
+  // Pathname dibaca saat klik (bukan lewat usePathname) agar layout publik tetap bisa di-prerender.
   const handleNavClick = (e: MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    // Jika berada di halaman landing page ('/'), lakukan smooth scroll manual
-    if (pathname === "/") {
-      e.preventDefault();
-      const el = document.getElementById(targetId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.pushState(null, "", `/#${targetId}`);
-      }
+    e.preventDefault();
+    setMobileOpen(false);
+    if (window.location.pathname === "/") {
+      document.getElementById(targetId)?.scrollIntoView({ block: "start" });
+      window.history.pushState(null, "", `/#${targetId}`);
     } else {
-      // Jika di halaman lain (misal /kos/id atau /login), navigasi ke /#targetId
-      e.preventDefault();
       router.push(`/#${targetId}`);
     }
-    setMobileOpen(false);
   };
 
-  useEffect(() => {
-    // 1. Cek token di localStorage / sessionStorage jika ada yang disimpan di client
-    const localToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("token") ||
-        localStorage.getItem("authToken") ||
-        localStorage.getItem("accessToken") ||
-        sessionStorage.getItem("token")
-        : null;
-
-    if (localToken) {
-      setTokenExists(true);
-    }
-
-    // 2. Cek token sesi via API backend (/api/auth/me) yang membaca cookie KosanKu_session
-    fetch("/api/auth/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.authenticated) {
-          setTokenExists(true);
-          if (data.user?.role === "owner") {
-            setDashboardHref("/admin");
-          } else {
-            setDashboardHref("/dashboard");
-          }
-        } else if (!localToken) {
-          setTokenExists(false);
-        }
-      })
-      .catch(() => {
-        // Abaikan jika offline / request gagal
-      });
-  }, []);
-
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
+    <header className="hairline-b sticky top-0 z-50 bg-ground/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 md:px-6">
-        <Link href="/" className="flex items-center gap-2.5 font-bold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Search size={16} />
-          </span>
+        <Link href="/" className="font-headline text-[17px] text-ink-12">
           KosanKu
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <Link href="/#home" onClick={(e) => handleNavClick(e, "home")} className="hover:text-foreground">
-            Home
-          </Link>
-          <Link href="/#about" onClick={(e) => handleNavClick(e, "about")} className="hover:text-foreground">
-            About
-          </Link>
-          <Link href="/#product" onClick={(e) => handleNavClick(e, "product")} className="hover:text-foreground">
-            Products
-          </Link>
-          <Link href="/#contact" onClick={(e) => handleNavClick(e, "contact")} className="hover:text-foreground">
-            Contact
-          </Link>
-          <Link href="/#faq" onClick={(e) => handleNavClick(e, "faq")} className="hover:text-foreground">
-            FAQ
-          </Link>
+        <nav aria-label="Navigasi utama" className="hidden items-center gap-6 text-sm text-ink-11 md:flex">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.id}
+              href={`/#${item.id}`}
+              onClick={(e) => handleNavClick(e, item.id)}
+              className="transition-colors duration-150 hover:text-ink-12"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          {tokenExists ? (
-            <Link
-              href={dashboardHref}
-              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => openModal("masuk")}
-                className="hidden rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted sm:inline-flex"
-              >
-                Masuk
-              </button>
-              <button
-                type="button"
-                onClick={() => openModal("daftar")}
-                className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-muted hover:text-foreground"
-              >
-                Daftar
-              </button>
-            </>
-          )}
+          <button
+            type="button"
+            onClick={() => openModal("masuk")}
+            className="btn btn-ghost btn-sm hidden sm:inline-flex"
+          >
+            Masuk
+          </button>
+          <button
+            type="button"
+            onClick={() => openModal("daftar")}
+            className="btn btn-primary btn-sm max-md:h-11"
+          >
+            Daftar
+          </button>
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Buka menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted md:hidden"
+            aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+            className="btn btn-ghost btn-icon h-11! w-11! md:hidden"
           >
-            <Search size={20} />
+            {mobileOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
           </button>
         </div>
       </div>
 
       {mobileOpen && (
-        <nav className="border-t border-border bg-background px-4 py-3 md:hidden">
+        <nav id="mobile-nav" aria-label="Navigasi utama" className="hairline-t animate-fade-in bg-panel px-5 py-3 md:hidden">
           <ul className="flex flex-col gap-1">
-            <li>
-              <Link
-                href="/#home"
-                onClick={(e) => handleNavClick(e, "home")}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/#about"
-                onClick={(e) => handleNavClick(e, "about")}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
-              >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/#product"
-                onClick={(e) => handleNavClick(e, "product")}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
-              >
-                Products
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/#contact"
-                onClick={(e) => handleNavClick(e, "contact")}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
-              >
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/#faq"
-                onClick={(e) => handleNavClick(e, "faq")}
-                className="block rounded-xl px-3 py-3 text-base font-medium text-foreground hover:bg-background"
-              >
-                FAQ
-              </Link>
-            </li>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/#${item.id}`}
+                  onClick={(e) => handleNavClick(e, item.id)}
+                  className="flex min-h-11 items-center rounded-control px-3 text-[15px] text-ink-12 transition-colors duration-150 hover:bg-ink-3"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
-          <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-            {tokenExists ? (
-              <Link
-                href={dashboardHref}
-                onClick={() => setMobileOpen(false)}
-                className="w-full rounded-xl bg-primary py-3 text-center text-sm font-medium text-primary-foreground transition hover:bg-muted hover:text-foreground"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    openModal("masuk");
-                    setMobileOpen(false);
-                  }}
-                  className="w-full rounded-xl border border-border py-3 text-center text-sm font-medium text-foreground transition hover:bg-muted"
-                >
-                  Masuk
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    openModal("daftar");
-                    setMobileOpen(false);
-                  }}
-                  className="w-full rounded-xl bg-primary py-3 text-center text-sm font-medium text-primary-foreground transition hover:bg-muted hover:text-foreground"
-                >
-                  Daftar
-                </button>
-              </>
-            )}
+          <div className="hairline-t mt-3 flex flex-col gap-3 pt-3">
+            <button
+              type="button"
+              onClick={() => {
+                openModal("masuk");
+                setMobileOpen(false);
+              }}
+              className="btn btn-secondary h-11 w-full"
+            >
+              Masuk
+            </button>
           </div>
         </nav>
       )}

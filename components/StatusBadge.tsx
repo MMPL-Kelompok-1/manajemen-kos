@@ -1,25 +1,17 @@
-import type { KosStatus } from "@/lib/data";
+import { statusInfo, toneBadgeClass, toneDotClass, type StatusKind } from "@/components/ui/status";
 
-const config: Record<KosStatus, { label: string; className: string }> = {
-  belum_pilih_kos: {
-    label: "Belum pilih kos",
-    className: "bg-muted text-muted-foreground",
-  },
-  belum_bayar: { label: "Belum bayar", className: "bg-amber-3 text-amber-11" },
-  menunggu_konfirmasi: {
-    label: "Menunggu konfirmasi",
-    className: "bg-blue-3 text-blue-11",
-  },
-  lunas: { label: "Lunas", className: "bg-green-3 text-green-11" },
-  terlambat: { label: "Terlambat", className: "bg-red-3 text-red-11" },
-};
+// Badge status. Contoh: <StatusBadge status="lunas" />, <StatusBadge kind="order" status="pending" />.
+export default function StatusBadge(props: StatusKind & { className?: string }) {
+  const { label, tone } = statusInfo(props);
+  return <span className={`badge shrink-0 ${toneBadgeClass[tone]} ${props.className ?? ""}`}>{label}</span>;
+}
 
-export default function StatusBadge({ status }: { status: KosStatus }) {
-  const { label, className } = config[status];
+// Status di tabel: titik berwarna + label, sesuai resep tabel tactile.
+export function StatusDot(props: StatusKind) {
+  const { label, tone } = statusInfo(props);
   return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold ${className}`}
-    >
+    <span className="inline-flex items-center gap-2 whitespace-nowrap">
+      <span className={`size-2 shrink-0 rounded-full ${toneDotClass[tone]}`} aria-hidden="true" />
       {label}
     </span>
   );
