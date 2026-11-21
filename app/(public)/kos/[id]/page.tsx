@@ -60,7 +60,7 @@ async function DetailProduct({ params }: { params: Promise<{ id: string }> }) {
               <h2 className="text-section mt-8">Fasilitas</h2>
               <ul className="mt-4 flex flex-wrap gap-1.5">
                 {kos.facilities.map((item) => (
-                  <li key={item} className="rounded-control bg-ink-3 px-2.5 py-1 text-sm text-ink-11">
+                  <li key={item} className="chip">
                     {item}
                   </li>
                 ))}

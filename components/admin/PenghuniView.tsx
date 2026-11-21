@@ -51,7 +51,7 @@ export default function PenghuniView({ data }: { data: TenantManagementData }) {
         </p>
       </div>
 
-      <section aria-label="Ringkasan penghuni" className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+      <section aria-label="Ringkasan penghuni" className="stat-list grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
         <StatCard value={stats.total} label="Total penghuni" />
         <StatCard value={stats.lunas} label="Lunas" tone="green" />
         <StatCard value={stats.menungguKonfirmasi} label="Menunggu konfirmasi" tone="blue" />

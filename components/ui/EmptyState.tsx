@@ -27,10 +27,10 @@ export default function EmptyState({
     <div
       role={role}
       className={`flex flex-col items-center px-6 text-center ${
-        variant === "panel" ? "rounded-container bg-ink-2 py-12" : "py-10"
+        variant === "panel" ? "rounded-container bg-ink-2 py-11" : "py-10"
       }`}
     >
-      {Icon && <Icon size={18} className="mb-3 text-ink-10" aria-hidden="true" />}
+      {Icon && <Icon size={18} className="mb-3 text-ink-9 max-md:size-6" aria-hidden="true" />}
       <Heading className="text-sm text-ink-12">{title}</Heading>
       {description && <p className="mt-1 max-w-sm text-sm text-ink-11">{description}</p>}
       {action && <div className="mt-5 flex w-full justify-center max-sm:[&>*]:w-full">{action}</div>}

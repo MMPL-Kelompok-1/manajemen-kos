@@ -6,7 +6,7 @@ import { ClipboardList } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/ui/EmptyState";
 import StatCard from "@/components/ui/StatCard";
-import { formatDate, formatRupiah } from "@/lib/format";
+import { formatDate, formatRupiah, formatRupiahCompact } from "@/lib/format";
 import type { UserDashboardData } from "@/lib/data";
 
 type Orders = UserDashboardData["orderHistory"];
@@ -42,9 +42,13 @@ export default function HistoriPesanan({ orders }: { orders: Orders }) {
         <p className="mt-1.5 text-sm text-ink-11">Semua pesanan kamar dan tagihannya, dari yang terbaru.</p>
       </div>
 
-      <section aria-label="Ringkasan" className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section aria-label="Ringkasan" className="stat-list grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard value={orders.length} label="Total pesanan" />
-        <StatCard value={formatRupiah(totalDibayar)} label="Total sudah dibayar" />
+        <StatCard
+          value={formatRupiahCompact(totalDibayar)}
+          title={formatRupiah(totalDibayar)}
+          label="Total sudah dibayar"
+        />
         <StatCard value={belumSelesai} label="Tagihan belum selesai" tone={belumSelesai > 0 ? "amber" : undefined} />
       </section>
 

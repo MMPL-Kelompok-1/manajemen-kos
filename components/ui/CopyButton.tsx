@@ -41,7 +41,7 @@ export default function CopyButton({ value, label, className = "" }: Props) {
       type="button"
       onClick={copy}
       aria-label={state === "idle" ? `Salin ${label}` : text}
-      className={`btn btn-pill shrink-0 ${state === "failed" ? "text-red-11" : ""} ${className}`}
+      className={`btn btn-pill touch-target shrink-0 ${state === "failed" ? "text-red-11" : ""} ${className}`}
     >
       {state === "copied" ? (
         <Check size={14} aria-hidden="true" />

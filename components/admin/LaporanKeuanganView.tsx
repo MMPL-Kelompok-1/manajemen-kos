@@ -6,7 +6,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Section from "@/components/ui/Section";
 import StatCard from "@/components/ui/StatCard";
 import Notice from "@/components/ui/Notice";
-import { currentJakartaMonthKey, formatMonthKey, formatRupiah } from "@/lib/format";
+import { currentJakartaMonthKey, formatMonthKey, formatRupiah, formatRupiahCompact } from "@/lib/format";
 import type { FinancialReport } from "@/lib/data";
 
 export default function LaporanKeuanganView({ report }: { report: FinancialReport }) {
@@ -60,18 +60,31 @@ export default function LaporanKeuanganView({ report }: { report: FinancialRepor
         </div>
       </div>
 
-      <section aria-label="Ringkasan keuangan" className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+      <section
+        aria-label="Ringkasan keuangan"
+        className="stat-list grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4"
+      >
         <StatCard
-          value={formatRupiah(report.totalRevenue)}
+          value={formatRupiahCompact(report.totalRevenue)}
+          title={formatRupiah(report.totalRevenue)}
           label={`Pendapatan ${report.year}`}
           tone="green"
           className="col-span-2 md:col-span-1"
         />
-        <StatCard value={formatRupiah(report.thisMonthRevenue)} label="Pendapatan bulan ini" />
-        <StatCard value={formatRupiah(report.averageMonthly)} label="Rata-rata per bulan" />
+        <StatCard
+          value={formatRupiahCompact(report.thisMonthRevenue)}
+          title={formatRupiah(report.thisMonthRevenue)}
+          label="Pendapatan bulan ini"
+        />
+        <StatCard
+          value={formatRupiahCompact(report.averageMonthly)}
+          title={formatRupiah(report.averageMonthly)}
+          label="Rata-rata per bulan"
+        />
         <StatCard value={report.paidTransactions} label="Transaksi lunas" />
         <StatCard
-          value={formatRupiah(report.receivableAmount)}
+          value={formatRupiahCompact(report.receivableAmount)}
+          title={formatRupiah(report.receivableAmount)}
           label={`Piutang (${report.receivableCount})`}
           tone={report.receivableCount > 0 ? "amber" : undefined}
           className="col-span-2 md:col-span-1"
@@ -101,7 +114,7 @@ export default function LaporanKeuanganView({ report }: { report: FinancialRepor
               return (
                 <div key={month.month} className="flex h-full flex-1 flex-col justify-end">
                   <div
-                    className={`w-full rounded-t-[3px] ${isCurrent ? "bg-blue-9" : "bg-blue-7"}`}
+                    className={`w-full rounded-t-[3px] ${isCurrent ? "bg-blue-9" : "bg-ink-5"}`}
                     style={{
                       height: `${percent}%`,
                       minHeight: month.revenue > 0 ? 4 : 0,
@@ -113,12 +126,12 @@ export default function LaporanKeuanganView({ report }: { report: FinancialRepor
             })}
           </div>
           <div className="mt-2 flex gap-1.5 sm:gap-2" aria-hidden="true">
-            {report.monthly.map((month) => (
+            {report.monthly.map((month, index) => (
               <span
                 key={month.month}
                 className={`flex-1 text-center text-xs ${
                   month.month === currentMonth ? "text-ink-12" : "text-ink-10"
-                }`}
+                } ${index % 2 === 1 ? "max-sm:invisible" : ""}`}
               >
                 {month.label.slice(0, 3)}
               </span>

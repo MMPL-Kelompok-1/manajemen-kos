@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { ChartColumn, ClipboardList, ReceiptText, Search, Users } from "lucide-react";
+import { ClipboardList, Search, Users } from "lucide-react";
 import { ConfirmPaymentButton, RoomEditor } from "@/components/admin/TenantActions";
 import StatusBadge, { StatusDot } from "@/components/StatusBadge";
 import CopyButton from "@/components/ui/CopyButton";
@@ -59,61 +58,23 @@ export default function AdminDashboardView({ overview }: { overview?: AdminOverv
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-8 px-5 py-6 pb-12 md:px-6 md:py-8">
-      <h1 className="sr-only">Dashboard admin</h1>
+      <div>
+        <h1 className="text-section">Dashboard</h1>
+        <p className="mt-1.5 text-sm text-ink-11">
+          Pembayaran yang menunggu konfirmasi dan kondisi penghuni.
+        </p>
+      </div>
 
-      <section aria-label="Ringkasan" className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+      <section
+        aria-label="Ringkasan"
+        className="stat-list grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4"
+      >
         <StatCard value={stats.lunas} label="Penghuni lunas" tone="green" />
         <StatCard value={stats.menungguKonfirmasi} label="Menunggu konfirmasi" tone="blue" />
         <StatCard value={stats.terlambat} label="Terlambat" tone="red" />
         <StatCard value={stats.belumBayar} label="Belum bayar" tone="amber" />
         <StatCard value={stats.totalKamarTersisa} label="Kamar tersisa" className="col-span-2 md:col-span-1" />
       </section>
-
-      <nav aria-label="Menu pengelolaan" className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Link
-          href="/admin/penghuni"
-          className="surface-raised press-card flex items-center gap-3 px-4 py-3 text-sm text-ink-12"
-        >
-          <Users size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
-          <span>
-            Manajemen penghuni
-            <span className="mt-0.5 block text-meta">Data penghuni, kamar, dan tagihan</span>
-          </span>
-        </Link>
-        <Link
-          href="/admin/transaksi"
-          className="surface-raised press-card flex items-center gap-3 px-4 py-3 text-sm text-ink-12"
-        >
-          <ReceiptText size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
-          <span>
-            Transaksi &amp; pembayaran
-            <span className="mt-0.5 block text-meta">Konfirmasi dan riwayat pembayaran</span>
-          </span>
-        </Link>
-        <Link
-          href="/admin/laporan"
-          className="surface-raised press-card flex items-center gap-3 px-4 py-3 text-sm text-ink-12"
-        >
-          <ChartColumn size={16} className="shrink-0 text-ink-10" aria-hidden="true" />
-          <span>
-            Laporan keuangan
-            <span className="mt-0.5 block text-meta">Pendapatan bulanan dan piutang</span>
-          </span>
-        </Link>
-      </nav>
-
-      {kosSummary.length > 0 && (
-        <section aria-label="Kos" className="-mx-0.5 flex gap-3 overflow-x-auto p-0.5 pb-1">
-          {kosSummary.map((kos) => (
-            <div key={kos.id} className="surface-raised min-w-[200px] shrink-0 px-4 py-3">
-              <p className="text-sm text-ink-12">{kos.name}</p>
-              <p className="text-sm text-ink-11">
-                {formatRupiah(kos.price)} · sisa {kos.roomsLeft} kamar
-              </p>
-            </div>
-          ))}
-        </section>
-      )}
 
       <Section
         id="pesanan"
@@ -184,6 +145,19 @@ export default function AdminDashboardView({ overview }: { overview?: AdminOverv
           </div>
         )}
       </Section>
+
+      {kosSummary.length > 0 && (
+        <section aria-label="Kos" className="-mx-0.5 flex gap-3 overflow-x-auto p-0.5 pb-1">
+          {kosSummary.map((kos) => (
+            <div key={kos.id} className="surface-raised min-w-[200px] shrink-0 px-4 py-3">
+              <p className="text-sm text-ink-12">{kos.name}</p>
+              <p className="text-sm text-ink-11">
+                {formatRupiah(kos.price)} · sisa {kos.roomsLeft} kamar
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
 
       <Section
         id="penghuni"

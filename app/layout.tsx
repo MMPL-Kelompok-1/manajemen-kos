@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: {
@@ -43,7 +42,6 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-background text-ink-12">
         {children}
-        <ThemeToggle />
         <Script
           id="theme-initializer"
           strategy="beforeInteractive"

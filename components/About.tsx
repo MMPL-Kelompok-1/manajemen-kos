@@ -3,7 +3,6 @@ const fitur = [
   {
     title: "Harga dan fasilitas tercantum jelas",
     desc: "Setiap kamar menampilkan harga per bulan, ukuran, kamar mandi, fasilitas, dan sisa kamar sebelum kamu mendaftar.",
-    wide: true,
   },
   {
     title: "Daftar dari halaman kamar",
@@ -16,7 +15,6 @@ const fitur = [
   {
     title: "Status tagihan di dashboard",
     desc: "Lihat status pembayaran, tanggal jatuh tempo, dan histori pesanan kapan saja dari akunmu.",
-    wide: true,
   },
 ];
 
@@ -24,7 +22,7 @@ export default function About() {
   return (
     <section id="about" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-16 md:px-6 md:py-24">
       <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-        <h2 className="font-headline text-display max-w-lg">
+        <h2 className="font-headline text-section max-w-lg">
           <span className="text-ink-11">Kenapa KosanKu?</span> Jelas dari pilih kamar sampai bayar.
         </h2>
         <p className="max-w-sm text-sm text-ink-11 max-md:text-[15px] md:text-right">
@@ -32,9 +30,9 @@ export default function About() {
         </p>
       </div>
 
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2 md:mt-10 md:grid-cols-3">
-        {fitur.map(({ title, desc, wide }) => (
-          <li key={title} className={`surface-raised rounded-container p-6 ${wide ? "md:col-span-2" : ""}`}>
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 md:mt-10">
+        {fitur.map(({ title, desc }) => (
+          <li key={title} className="surface-raised rounded-container p-6">
             <h3 className="text-title">{title}</h3>
             <p className="mt-1 max-w-md text-sm text-ink-11 max-md:text-[15px]">{desc}</p>
           </li>

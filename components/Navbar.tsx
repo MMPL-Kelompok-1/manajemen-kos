@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useAuthModal } from "@/components/auth/AuthModalContext";
 
 // Hanya bagian yang benar-benar ada di landing page.
@@ -63,6 +64,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => openModal("masuk")}
@@ -73,7 +75,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => openModal("daftar")}
-            className="btn btn-primary btn-sm max-md:h-11"
+            className="btn btn-secondary btn-sm max-md:h-11"
           >
             Daftar
           </button>

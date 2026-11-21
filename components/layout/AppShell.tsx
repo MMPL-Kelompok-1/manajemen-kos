@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeft } from "lucide-react";
 import LogoutButton from "@/components/auth/LogoutButton";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useFocusTrap } from "@/components/ui/useFocusTrap";
 
 export type NavItem = {
@@ -33,7 +34,6 @@ export default function AppShell({ navItems, title, children }: Props) {
   const active = navItems
     .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
     .sort((a, b) => b.href.length - a.href.length)[0];
-  const heading = active?.label ?? title;
 
   useFocusTrap(asideRef, mobileOpen, () => setMobileOpen(false));
 
@@ -73,7 +73,7 @@ export default function AppShell({ navItems, title, children }: Props) {
         ref={asideRef}
         id="app-sidebar"
         aria-label={`Menu ${title}`}
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-ground transition-[transform,visibility] duration-200 ease-[var(--ease-drawer)] motion-reduce:transition-none max-md:bg-panel max-md:shadow-[var(--shadow-panel)] md:sticky md:top-0 md:h-dvh md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-[292px] flex-col bg-ground transition-[transform,visibility] duration-200 ease-[var(--ease-drawer)] motion-reduce:transition-none max-md:bg-panel max-md:shadow-[var(--shadow-panel)] md:sticky md:top-0 md:h-dvh md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "max-md:invisible -translate-x-full"
         } ${collapsed ? "md:hidden" : ""}`}
       >
@@ -123,9 +123,12 @@ export default function AppShell({ navItems, title, children }: Props) {
             >
               <PanelLeft size={18} aria-hidden="true" />
             </button>
-            <p className="truncate text-sm text-ink-12">{heading}</p>
+            <p className="truncate text-sm text-ink-12">{title}</p>
           </div>
-          <LogoutButton redirectTo="/" />
+          <div className="flex shrink-0 items-center gap-1">
+            <ThemeToggle />
+            <LogoutButton redirectTo="/" />
+          </div>
         </header>
 
         <main id="konten" tabIndex={-1} className="flex-1 outline-none">

@@ -13,6 +13,13 @@
 /* Varian dark: mengikuti kelas dari tombol tema, bukan prefers-color-scheme. */
 @custom-variant dark (&:where(.dark, .dark *, .dark-theme, .dark-theme *));
 
+/* Hover hanya untuk mouse/trackpad. Di layar sentuh hover menempel setelah tap. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover { @slot; }
+  }
+}
+
 /* Token tactile. Neutral = Radix sand; komponen memakai peran (ink-N, surface, shadow), bukan hex. */
 :root,
 .light,
@@ -137,10 +144,56 @@
 
 /* Ponsel & layar sentuh: hanya nilai. */
 @media screen and (width < 48rem) {
-  :root { --control-h: 44px; --row-h: 44px; --text-body: 15px; --leading-body: 24px; }
+  :root {
+    --control-h: 44px; --row-h: 44px;
+    --text-body: 15px; --leading-body: 24px;
+    --text-meta: 15px; --leading-meta: 20px;
+    --badge-h: 22px;
+  }
+  /* Badge HP: 22px dengan teks 14px. */
+  .badge.badge { font-size: 14px; }
+  /* Tidak ada scrollbar di HP. */
+  :is(.overflow-auto, .overflow-x-auto, .overflow-y-auto) { scrollbar-width: none; }
+  :is(.overflow-auto, .overflow-x-auto, .overflow-y-auto)::-webkit-scrollbar { display: none; }
+
+  /* Statistik di HP: satu panel, baris label kiri / nilai kanan.
+     Selektor digandakan agar menang atas utilitas grid dan .surface-raised. */
+  .stat-list.stat-list {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-container);
+    background: var(--raised);
+    box-shadow: var(--shadow-card);
+  }
+  .stat-list.stat-list > * {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 8px;
+    padding: 12px 16px;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .stat-list.stat-list > * + * { border-top: var(--hairline) solid var(--line); }
+  .stat-list.stat-list > * > :first-child { grid-area: 1 / 2; text-align: right; }
+  .stat-list.stat-list > * > :nth-child(2) { grid-area: 1 / 1; }
+  .stat-list.stat-list > * > :nth-child(n + 3) { grid-area: 2 / 1 / auto / -1; margin-top: 0; }
 }
 @media (pointer: coarse) {
   :root { --text-field: 16px; }
+  /* Area sentuh 44x44 tanpa mengubah tampilan kontrol kecil. */
+  .touch-target { position: relative; }
+  .touch-target::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* Token ke utilitas Tailwind v4 */
@@ -298,6 +351,7 @@ html {
   color-scheme: light dark;
   scroll-behavior: smooth;
   font-size-adjust: 0.546;
+  overscroll-behavior: none;
 }
 
 body {
@@ -312,6 +366,11 @@ body {
 :where(a, button, [role="button"], [role="tab"], [role="switch"], summary, input, select, textarea):focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+/* Ketukan langsung, tanpa jeda double-tap. */
+:where(a, button, [role="button"], summary, select, input, textarea, label[for]) {
+  touch-action: manipulation;
 }
 
 /* Kursor: ditetapkan sekali. Utilitas Tailwind tetap bisa menimpa. */
@@ -457,6 +516,20 @@ body {
   .badge-red { background: var(--red-3); color: var(--red-11); }
   .badge-amber { background: var(--amber-3); color: var(--amber-11); }
   .badge-blue { background: var(--blue-3); color: var(--blue-11); }
+
+  /* Chip diam: fasilitas, spesifikasi, tag. Bukan status, jadi tanpa bayangan. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: var(--badge-h);
+    padding-inline: 8px;
+    border-radius: var(--radius-control);
+    background: var(--ink-3);
+    color: var(--ink-11);
+    font-size: var(--text-meta);
+    line-height: var(--badge-h);
+    white-space: nowrap;
+  }
 
   /* Tabel */
   .table-tactile {

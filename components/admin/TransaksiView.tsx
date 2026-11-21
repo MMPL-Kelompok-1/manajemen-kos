@@ -9,7 +9,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Section from "@/components/ui/Section";
 import StatCard from "@/components/ui/StatCard";
 import { DefinitionList } from "@/components/ui/DefinitionList";
-import { formatDate, formatMonthKey, formatRupiah, jakartaMonthKey } from "@/lib/format";
+import { formatDate, formatMonthKey, formatRupiah, formatRupiahCompact, jakartaMonthKey } from "@/lib/format";
 import { paymentStatus } from "@/components/ui/status";
 import type { PaymentStatus } from "@/lib/payment";
 import type { TransactionManagementData } from "@/lib/data";
@@ -66,15 +66,25 @@ export default function TransaksiView({ data }: { data: TransactionManagementDat
         </p>
       </div>
 
-      <section aria-label="Ringkasan transaksi" className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        <StatCard value={formatRupiah(stats.receivedThisMonth)} label="Pendapatan bulan ini" tone="green" />
+      <section
+        aria-label="Ringkasan transaksi"
+        className="stat-list grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
+      >
         <StatCard
-          value={formatRupiah(stats.pendingAmount)}
+          value={formatRupiahCompact(stats.receivedThisMonth)}
+          title={formatRupiah(stats.receivedThisMonth)}
+          label="Pendapatan bulan ini"
+          tone="green"
+        />
+        <StatCard
+          value={formatRupiahCompact(stats.pendingAmount)}
+          title={formatRupiah(stats.pendingAmount)}
           label={`Menunggu konfirmasi (${stats.pendingCount})`}
           tone="blue"
         />
         <StatCard
-          value={formatRupiah(stats.unpaidAmount)}
+          value={formatRupiahCompact(stats.unpaidAmount)}
+          title={formatRupiah(stats.unpaidAmount)}
           label={`Belum bayar (${stats.unpaidCount})`}
           tone="amber"
         />

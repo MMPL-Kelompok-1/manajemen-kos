@@ -163,7 +163,7 @@ export default function AddRoomDialog({ onClose }: { onClose: () => void }) {
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-100 flex items-end justify-center sm:items-center sm:p-4">
       <div
         className="animate-fade-in fixed inset-0 backdrop-blur-[2px]"
         style={{ background: "var(--backdrop)" }}
@@ -178,6 +178,15 @@ export default function AddRoomDialog({ onClose }: { onClose: () => void }) {
         aria-describedby="add-room-desc"
         className="surface-overlay animate-modal-in relative flex max-h-[92svh] w-full max-w-[620px] flex-col rounded-b-none rounded-t-[14px] sm:rounded-container"
       >
+        <button
+          type="button"
+          onClick={close}
+          disabled={saving}
+          aria-label="Tutup"
+          className="group absolute left-1/2 top-0 flex h-14 w-[88px] -translate-x-1/2 -translate-y-full items-end justify-center pb-3 sm:hidden"
+        >
+          <span className="block h-[5px] w-9 rounded-full bg-white shadow-[inset_0_-0.5px_0_rgb(0_0_0/.08),0_0_0_0.5px_rgb(0_0_0/.12),0_1px_2px_rgb(0_0_0/.28)] transition-transform duration-150 ease-[var(--ease-out)] group-active:scale-95" />
+        </button>
         <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-4 pt-5">
           <div>
             <h2 id="add-room-title" className="text-title">
@@ -191,7 +200,7 @@ export default function AddRoomDialog({ onClose }: { onClose: () => void }) {
             type="button"
             onClick={close}
             disabled={saving}
-            className="btn btn-ghost btn-icon btn-sm -mr-1 -mt-1 max-md:size-11"
+            className="btn btn-ghost btn-icon btn-sm -mr-1 -mt-1 max-sm:hidden"
             aria-label="Tutup"
           >
             <X className="size-4" aria-hidden="true" />

@@ -7,9 +7,20 @@ export function formatRupiah(value: number): string {
   }).format(value);
 }
 
+// Angka besar jadi ringkas untuk figure, contoh: Rp 1,5 jt. Nilai penuh tetap ada di title.
+export function formatRupiahCompact(value: number): string {
+  if (Math.abs(value) < 1_000_000) return formatRupiah(value);
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 // Format tanggal, contoh: 18 Oktober 2026. Zona waktu dipaku agar server dan browser sama.
 export function formatDate(iso: string | null | undefined): string {
-  if (!iso) return "-";
+  if (!iso) return "–";
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "long",

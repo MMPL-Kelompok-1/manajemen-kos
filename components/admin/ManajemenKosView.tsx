@@ -10,7 +10,7 @@ import Section from "@/components/ui/Section";
 import Segmented from "@/components/ui/Segmented";
 import StatCard from "@/components/ui/StatCard";
 import type { RoomManagementData } from "@/lib/data";
-import { formatRupiah } from "@/lib/format";
+import { formatRupiah, formatRupiahCompact } from "@/lib/format";
 
 type StatusFilter = "ALL" | "TERISI" | "SIAP HUNI";
 const SEMUA_LANTAI = "";
@@ -91,7 +91,10 @@ export default function ManajemenKosView({ initialData }: { initialData: RoomMan
         />
       ) : (
         <>
-          <section aria-label="Ringkasan" className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <section
+            aria-label="Ringkasan"
+            className="stat-list grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
+          >
             <StatCard value={stats.totalRooms} label="Total kamar" />
             <StatCard
               value={
@@ -103,7 +106,7 @@ export default function ManajemenKosView({ initialData }: { initialData: RoomMan
               label="Kamar terisi"
               tone="blue"
             >
-              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-ink-4" aria-hidden="true">
+              <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-ink-4" aria-hidden="true">
                 <div
                   className="h-full rounded-full bg-blue-9"
                   style={{ width: `${Math.min(100, stats.occupancyRate)}%` }}
@@ -111,7 +114,11 @@ export default function ManajemenKosView({ initialData }: { initialData: RoomMan
               </div>
             </StatCard>
             <StatCard value={stats.availableRooms} label="Kamar kosong" tone="green" />
-            <StatCard value={formatRupiah(stats.potentialRevenue)} label="Potensi pendapatan / bulan" />
+            <StatCard
+              value={formatRupiahCompact(stats.potentialRevenue)}
+              title={formatRupiah(stats.potentialRevenue)}
+              label="Potensi pendapatan / bulan"
+            />
           </section>
 
           <Section
@@ -150,7 +157,7 @@ export default function ManajemenKosView({ initialData }: { initialData: RoomMan
                       {room.facilities.length > 0 && (
                         <ul aria-label="Fasilitas" className="flex flex-wrap gap-1">
                           {room.facilities.map((fac) => (
-                            <li key={fac} className="badge badge-neutral">
+                            <li key={fac} className="chip">
                               {fac}
                             </li>
                           ))}

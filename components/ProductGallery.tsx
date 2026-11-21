@@ -21,7 +21,7 @@ export default function ProductGallery({ photos, name }: { photos: string[]; nam
               type="button"
               onClick={() => setActive(index)}
               aria-label={`Lihat foto ${index + 1}`}
-              className={`aspect-[4/3] overflow-hidden rounded-control transition-[opacity,box-shadow] duration-150 ${index === active ? "ring-2 ring-ink-12" : "opacity-70 hover:opacity-100"}`}
+              className={`aspect-[4/3] overflow-hidden rounded-control transition-shadow duration-150 ${index === active ? "ring-[1.5px] ring-ink-12" : ""}`}
             >
               <ListingImage src={photo} alt={`Foto ${index + 1}`} />
             </button>

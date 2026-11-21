@@ -13,7 +13,7 @@ export default function Hero() {
       >
         <div className="relative w-full p-3 md:p-12">
           <div className="surface-overlay max-w-xl p-5 md:p-8">
-            <h1 className="font-headline text-display md:text-[44px] md:leading-[52px]">
+            <h1 className="font-headline text-display">
               <span className="text-ink-11">Temukan kos</span> yang pas untukmu
             </h1>
             <p className="mt-4 max-w-md text-sm text-ink-11 max-md:text-[15px]">

@@ -53,9 +53,9 @@ export default function AuthForms({ initialTab = "masuk", kosId = null, isModal 
   }
 
   return (
-    <div className={isModal ? "w-full" : "mx-auto w-full max-w-[440px] px-5 py-12 sm:py-20"}>
+    <div className={isModal ? "w-full" : "mx-auto w-full max-w-[464px] px-5 py-12 sm:py-20"}>
       <div
-        className={`relative p-5 pb-[max(20px,env(safe-area-inset-bottom))] sm:p-6 ${
+        className={`relative p-5 pb-[max(20px,env(safe-area-inset-bottom))] sm:p-8 ${
           isModal
             ? "surface-overlay animate-modal-in rounded-b-none rounded-t-[14px] md:rounded-container"
             : "surface-raised rounded-container"
@@ -70,7 +70,7 @@ export default function AuthForms({ initialTab = "masuk", kosId = null, isModal 
               type="button"
               onClick={onClose}
               aria-label="Tutup"
-              className="btn btn-ghost btn-icon btn-sm -mr-2 -mt-1 max-md:size-11"
+              className="btn btn-ghost btn-icon btn-sm -mr-2 -mt-1 max-md:hidden"
             >
               <X size={16} aria-hidden="true" />
             </button>
@@ -130,7 +130,7 @@ export default function AuthForms({ initialTab = "masuk", kosId = null, isModal 
           )}
 
           <label className="block">
-            <span className="field-label">Gmail</span>
+            <span className="field-label">Email</span>
             <input
               data-autofocus={isRegister ? undefined : true}
               required
@@ -144,6 +144,7 @@ export default function AuthForms({ initialTab = "masuk", kosId = null, isModal 
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="field"
             />
+            {isRegister && <span className="field-hint">Saat ini hanya alamat Gmail yang diterima.</span>}
           </label>
 
           <label className="block">

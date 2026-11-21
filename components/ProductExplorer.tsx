@@ -47,7 +47,7 @@ export default function ProductExplorer({ items = [] }: { items?: Kos[] }) {
                 <div className="flex flex-1 flex-col p-4">
                   <h3 className="text-title">
                     {/* Seluruh kartu bisa diklik lewat tautan ini */}
-                    <Link href={href} className="after:absolute after:inset-0 hover:text-ink-11 transition-colors duration-150">
+                    <Link href={href} className="after:absolute after:inset-0">
                       {item.name}
                     </Link>
                   </h3>

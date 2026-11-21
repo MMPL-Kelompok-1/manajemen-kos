@@ -113,10 +113,10 @@ export default function KosAnda({ data, pendingKosId }: Props) {
 
               {(kos.gender || kos.bathroom || fasilitas.length > 0) && (
                 <ul aria-label="Fasilitas" className="hairline-t mt-5 flex flex-wrap gap-1.5 pt-5">
-                  {kos.gender && <li className="badge badge-neutral">{kos.gender}</li>}
-                  {kos.bathroom && <li className="badge badge-neutral">KM {kos.bathroom}</li>}
+                  {kos.gender && <li className="chip">{kos.gender}</li>}
+                  {kos.bathroom && <li className="chip">KM {kos.bathroom}</li>}
                   {fasilitas.map((item) => (
-                    <li key={item} className="badge badge-neutral">
+                    <li key={item} className="chip">
                       {item}
                     </li>
                   ))}
